@@ -24,13 +24,14 @@ public class Battle {
     EffectHandler effectHandler;
 
     public Battle() {
+
         // Estado da Batalha
         battleState = BattleState.IN_PROGRESS;
 
         // Jogadores
         players = new ArrayList<>();
-        players.add(new ControllableEntity("NOYUR", 6, "deck01.txt"));
-        players.add(new AiEntity("BOT", 6, "deck01.txt"));
+        players.add(new ControllableEntity("NOYUR", 6, 3, "deck01.txt"));
+        players.add(new AiEntity("BOT", 6, 3,"deck01.txt"));
 
         // Outras variáveis
         this.currentTurn = 0;
@@ -44,12 +45,12 @@ public class Battle {
     }
 
     public void startBattle() {
+
         // Entidades
         PlayerEntity firstPlayer = players.get(0);
         PlayerEntity secondPlayer = players.get(1);
 
-        // Embaralha o deck de ambos os jogadores
-        // ambos compram 6 cartas
+        // Embaralha o baralho de ambos os jogadores e
         for (PlayerEntity player : players) {
             player.getCardManager().shuffleDeck();
             player.getCardManager().drawCards(6);
@@ -100,40 +101,72 @@ public class Battle {
         }
     }
 
-    public void endTurn() {
+    public void startPlayerTurn() {
+        // Resgatamos a entidade do Jogador
+        PlayerEntity currentPlayer = players.get(currentPlayerIndex);
+        CardManager cardManager = currentPlayer.getCardManager();
+
+        // Tentamos comprar uma carta
+        int drawnCards = cardManager.drawCards(1);
+
+        // Mensagem de compra de cartas
+        battleMessageHandler.sendMessage(currentPlayer.getName() + " comprou " + drawnCards + " cartas(s) do baralho.");
+    }
+
+    private void startAiTurn() {
+        // Resgatamos a entidade da AI
+        PlayerEntity aiEntity = players.get(currentPlayerIndex);
+        CardManager cardManager = aiEntity.getCardManager();
+
+        // Tentamos comprar uma carta, assim como no turno do jogador
+        int drawnCards = cardManager.drawCards(1);
+
+        // Mensagem de compra de cartas
+        if (drawnCards > 0) {
+            battleMessageHandler.sendMessage(aiEntity.getName() + " comprou " + drawnCards + " cartas(s) do baralho.");
+        }
+
+        // AI seleciona o melhor movimento
+        Card card = aiEntity.selectBestCard();
+        boolean isCardPlayable = true;
+
+        // Enquanto a AI tiver opções viáveis de acordo com o algoritmo,
+        // ela utiliza as cartas selecionadas
+        while(card != null && isCardPlayable) {
+            isCardPlayable = playCard(card);
+            card = aiEntity.selectBestCard();
+        }
+
+        // Finalizamos o turno da AI
+        endAiTurn();
+    }
+
+    public void endPlayerTurn() {
         if (battleState.equals(BattleState.IN_PROGRESS)) {
-            // Caso seja a finalização do turno do último jogador
-            // devemos determinar a carta em campo vencedora
-            if (bothPlayersCompletedRound()) {
-                handleBattlePhase();
-                updateBattleState();
-
-                if (battleState.equals(BattleState.FINISHED)) {
-                    return;
-                }
-            }
-
             // Incrementamos o turno e atualizamos o index do jogador
             currentTurn++;
             updateCurrentPlayerIndex();
-            PlayerEntity currentPlayer = players.get(currentPlayerIndex);
 
-            // Mensagem de fim de turno
-            battleMessageHandler.sendMessage("Turno finalizado! Vez de " + currentPlayer.getName() + ".");
+            // Iniciamos o turno da AI
+            startAiTurn();
+        }
+    }
 
-            // Jogador atual tenta comprar uma nova carta
-            int drawnCards = currentPlayer.getCardManager().drawCards(1);
-            if (drawnCards > 0) {
-                battleMessageHandler.sendMessage(currentPlayer.getName() + " comprou " + drawnCards + " cartas(s).");
-            }
+    public void endAiTurn() {
+        // Como a AI sempre é a última a jogar, garantimos a finalização da rodada
+        // Assim, lidamos com a questão da batalha assim que a AI finaliza seu turno
+        handleBattlePhase();
 
-            // Caso a entidade seja uma AI, tentamos selecionar a melhor carta
-            Card card = currentPlayer.selectBestCard();
-            boolean isPossibleToPlayCard = true;
-            while (card != null && isPossibleToPlayCard) {
-                isPossibleToPlayCard = playCard(card);
-                card = currentPlayer.selectBestCard();
-            }
+        // Atualizamos o estado da batalha
+        updateBattleState();
+
+        if (battleState.equals(BattleState.IN_PROGRESS)) {
+            // Incrementamos o turno e atualizamos o index do jogador atual
+            currentTurn++;
+            updateCurrentPlayerIndex();
+
+            // Iniciamos o turno do jogador
+            startPlayerTurn();
         }
     }
 
@@ -167,12 +200,11 @@ public class Battle {
         // Consumimos as cartas em campo
         consumeFieldCards();
 
-        // Fase de combate para determina o vencedor da rodada
-        combatPhaseHandler.handleCombatPhase(firstPlayer, secondPlayer, firstPlayerCard, secondPlayerCard, firstPlayerEffects, secondPlayerEffects);
+        // Fase de combate para determinar o vencedor da rodada
+        combatPhaseHandler.handleCombatPhase(firstPlayer, secondPlayer, firstPlayerCard, secondPlayerCard);
     }
 
     public boolean bothPlayersCompletedRound() {
-        System.out.println(currentPlayerIndex + 1 == players.size());
         return currentPlayerIndex + 1 == players.size();
     }
 

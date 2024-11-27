@@ -9,10 +9,12 @@ public abstract class PlayerEntity {
 
     String name;
     int hp;
+    int mana;
     CardManager cardManager;
     BufferedImage sprite;
 
-    public PlayerEntity(String name, int hp, String deckName) {
+    public PlayerEntity(String name, int hp, int mana, String deckName) {
+        this.mana = mana;
         this.name = name;
         this.hp = hp;
         cardManager = new CardManager();
@@ -29,6 +31,12 @@ public abstract class PlayerEntity {
 
     public abstract Card selectBestCard();
 
+    public int getMana() {
+        return mana;
+    }
+    public void setMana(int mana) {
+        this.mana = mana;
+    }
     public String getName() {
         return name;
     }
@@ -48,6 +56,9 @@ public abstract class PlayerEntity {
     @Override
     public String toString() {
         return "Player{" +
+                "mana=" + mana + '\'' +
+                ", name='" + name + '\'' +
+                ", hp=" + hp +
                 "name='" + name + '\'' +
                 ", hp=" + hp +
                 '}';

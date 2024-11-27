@@ -6,8 +6,6 @@ import game.battle.BattleState;
 import game.cards.Card;
 import game.input.KeyHandler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class BattleMenuController {
@@ -120,7 +118,7 @@ public class BattleMenuController {
                 }
 
             } else if (currentOption.equals(BattleMenuOption.ENCERRAR)) {
-                battle.endTurn();
+                battle.endPlayerTurn();
                 currentMode = BattleMenuMode.MESSAGE;
             }
 

@@ -17,7 +17,7 @@ public class CombatPhaseHandler {
         this.effectHandler = effectHandler;
     }
 
-    public void handleCombatPhase(PlayerEntity firstPlayer, PlayerEntity secondPlayer, Card firstPlayerCard, Card secondPlayerCard, List<Card> firstPlayerEffects, List<Card> secondPlayerEffects) {
+    public void handleCombatPhase(PlayerEntity firstPlayer, PlayerEntity secondPlayer, Card firstPlayerCard, Card secondPlayerCard) {
         // Se ambos os jogadores utilizaram cartas
         if (bothPlayersPlacedCards(firstPlayerCard, secondPlayerCard)) {
             int firstPlayerRawPower = firstPlayerCard.getPower();
@@ -29,8 +29,6 @@ public class CombatPhaseHandler {
 
             // Limpamos as listas de efeitos
             effectHandler.clearEffects();
-
-            System.out.println("Jogador 1: " + firstPlayerTotalPower + "\nJogador 2: " + secondPlayerTotalPower);
 
             if (firstPlayerTotalPower == secondPlayerTotalPower) { // EMPATE
                 battleMessageHandler.sendMessage("Empate!");

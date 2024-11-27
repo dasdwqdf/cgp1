@@ -7,6 +7,7 @@ import java.io.IOException;
 public class Card {
 
     String name;
+    int manaCost;
     CardType cardType;
     String description;
 
@@ -22,8 +23,9 @@ public class Card {
     BufferedImage cardTypeSprite;
     BufferedImage cardElementSprite;
 
-    public Card(String name, CardEffect cardEffect, Integer effectArg, String description) {
+    public Card(String name, int manaCost, CardEffect cardEffect, Integer effectArg, String description) {
         this.name = name;
+        this.manaCost = manaCost;
         this.cardType = CardType.EFFECT;
         this.cardEffect = cardEffect;
         this.effectArg = effectArg;
@@ -31,8 +33,9 @@ public class Card {
         this.cardTypeSprite = loadTypeSprite();
     }
 
-    public Card(String name, CardElement cardElement, Integer Power, String description) {
+    public Card(String name, int manaCost, CardElement cardElement, Integer Power, String description) {
         this.name = name;
+        this.manaCost = manaCost;
         this.cardType = CardType.POWER;
         this.cardElement = cardElement;
         this.power = Power;

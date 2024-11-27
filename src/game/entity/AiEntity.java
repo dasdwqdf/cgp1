@@ -5,8 +5,8 @@ import game.cards.CardType;
 
 public class AiEntity extends PlayerEntity {
 
-    public AiEntity(String name, int hp, String deckName) {
-        super(name, hp, deckName);
+    public AiEntity(String name, int hp, int mana, String deckName) {
+        super(name, hp, mana, deckName);
     }
 
     @Override

@@ -31,7 +31,7 @@ public class CardParser {
         String[] args = string.split(",");
 
         // Número de argumentos inválido
-        if (args.length != 5) {
+        if (args.length != 6) {
             return null;
         }
 
@@ -45,19 +45,21 @@ public class CardParser {
 
     public Card parseStringToEffectCard(String[] args) {
         String name = args[1];
-        CardEffect cardEffect = CardEffect.fromString(args[2]);
-        Integer effectArg = Integer.valueOf(args[3]);
-        String description = args[4];
+        int manaCost = Integer.parseInt(args[2]);
+        CardEffect cardEffect = CardEffect.fromString(args[3]);
+        Integer effectArg = Integer.valueOf(args[4]);
+        String description = args[5];
 
-        return new Card(name, cardEffect, effectArg, description);
+        return new Card(name, manaCost, cardEffect, effectArg, description);
     }
 
     public Card parseStringToPowerCard(String[] args) {
         String name = args[1];
-        CardElement cardElement = CardElement.fromString(args[2]);
-        Integer power = Integer.valueOf(args[3]);
-        String description = args[4];
+        int manaCost = Integer.parseInt(args[2]);
+        CardElement cardElement = CardElement.fromString(args[3]);
+        Integer power = Integer.valueOf(args[4]);
+        String description = args[5];
 
-        return new Card(name, cardElement, power, description);
+        return new Card(name, manaCost, cardElement, power, description);
     }
 }
