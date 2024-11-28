@@ -24,14 +24,13 @@ public class Battle {
     EffectHandler effectHandler;
 
     public Battle() {
-
         // Estado da Batalha
         battleState = BattleState.IN_PROGRESS;
 
         // Jogadores
         players = new ArrayList<>();
-        players.add(new ControllableEntity("NOYUR", 6, 3, "deck01.txt"));
-        players.add(new AiEntity("BOT", 6, 3,"deck01.txt"));
+        players.add(new ControllableEntity("NOYUR", 6, 0, "deck01.txt"));
+        players.add(new AiEntity("BOT", 6, 0,"deck01.txt"));
 
         // Outras variáveis
         this.currentTurn = 0;
@@ -45,7 +44,6 @@ public class Battle {
     }
 
     public void startBattle() {
-
         // Entidades
         PlayerEntity firstPlayer = players.get(0);
         PlayerEntity secondPlayer = players.get(1);
@@ -63,12 +61,24 @@ public class Battle {
         };
 
         battleMessageHandler.sendMessage(messages);
+
+        // Inicia o turno do jogador
+        startPlayerTurn();
     }
 
     public boolean playCard(Card card) {
         // Pega o jogador atual
         PlayerEntity currentPlayer = players.get(currentPlayerIndex);
         CardManager cardManager = currentPlayer.getCardManager();
+
+        // Mana do jogador insuficiente para utilizar a carta
+        if (card.getManaCost() > currentPlayer.getMana()) {
+            // Mensagem caso o jogador atual seja uma entidade controlável
+            if (currentPlayer instanceof ControllableEntity) {
+                battleMessageHandler.sendMessage("Mana insuficiente para utilizar " + card.getName() + ".");
+            }
+            return false;
+        }
 
         switch (card.getCardType()) {
             case POWER:
@@ -87,13 +97,22 @@ public class Battle {
                 fieldCards[currentPlayerIndex] = card;
                 cardManager.useCard(card);
 
+                // Consumimos a mana do jogador
+                currentPlayer.consumeMana(card.getManaCost());
+
                 // Mensagem de carta em campo
                 battleMessageHandler.sendMessage(currentPlayer.getName() + " colocou " + card.getName() + " em campo.");
+
                 return true;
 
             case EFFECT:
+                // Retiramos a carta da mão do jogador e consumimos a mana
                 cardManager.useCard(card);
+                currentPlayer.consumeMana(card.getManaCost());
+
+                // Aplicamos o efeito utilizando o handler de efeitos
                 effectHandler.handleEffect(currentPlayer, currentPlayerIndex, card);
+
                 return true;
 
             default:
@@ -101,30 +120,37 @@ public class Battle {
         }
     }
 
-    public void startPlayerTurn() {
-        // Resgatamos a entidade do Jogador
-        PlayerEntity currentPlayer = players.get(currentPlayerIndex);
+    public void handleTurnStart(PlayerEntity currentPlayer) {
         CardManager cardManager = currentPlayer.getCardManager();
+
+        // Jogador recupera mana
+        if (currentPlayer.getMana() < PlayerEntity.maxMana) {
+            currentPlayer.regenMana(1);
+        }
 
         // Tentamos comprar uma carta
         int drawnCards = cardManager.drawCards(1);
 
-        // Mensagem de compra de cartas
-        battleMessageHandler.sendMessage(currentPlayer.getName() + " comprou " + drawnCards + " cartas(s) do baralho.");
+        if (drawnCards > 0) {
+            // Mensagem de compra de cartas
+            battleMessageHandler.sendMessage(currentPlayer.getName() + " comprou " + drawnCards + " cartas(s) do baralho.");
+        }
+    }
+
+    public void startPlayerTurn() {
+        // Resgatamos a entidade do Jogador
+        PlayerEntity currentPlayer = getPlayerEntities().get(currentPlayerIndex);
+
+        // Fazemos o processamento genérico de turno de um objeto PlayerEntity
+        handleTurnStart(currentPlayer);
     }
 
     private void startAiTurn() {
         // Resgatamos a entidade da AI
         PlayerEntity aiEntity = players.get(currentPlayerIndex);
-        CardManager cardManager = aiEntity.getCardManager();
 
-        // Tentamos comprar uma carta, assim como no turno do jogador
-        int drawnCards = cardManager.drawCards(1);
-
-        // Mensagem de compra de cartas
-        if (drawnCards > 0) {
-            battleMessageHandler.sendMessage(aiEntity.getName() + " comprou " + drawnCards + " cartas(s) do baralho.");
-        }
+        // Processamento genérico de turno de um PlayerEntity
+        handleTurnStart(aiEntity);
 
         // AI seleciona o melhor movimento
         Card card = aiEntity.selectBestCard();
@@ -206,6 +232,10 @@ public class Battle {
 
     public boolean bothPlayersCompletedRound() {
         return currentPlayerIndex + 1 == players.size();
+    }
+
+    private List<PlayerEntity> getPlayerEntities() {
+        return players;
     }
 
     public List<PlayerEntity> getPlayers() {

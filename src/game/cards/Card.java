@@ -83,6 +83,10 @@ public class Card {
         return name;
     }
 
+    public int getManaCost() {
+        return manaCost;
+    }
+
     public CardType getCardType() {
         return cardType;
     }

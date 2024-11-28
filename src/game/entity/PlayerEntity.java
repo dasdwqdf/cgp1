@@ -7,6 +7,8 @@ import java.awt.image.BufferedImage;
 
 public abstract class PlayerEntity {
 
+    public static int maxMana = 3;
+
     String name;
     int hp;
     int mana;
@@ -19,6 +21,14 @@ public abstract class PlayerEntity {
         this.hp = hp;
         cardManager = new CardManager();
         cardManager.initDeck(deckName);
+    }
+
+    public void regenMana(int value) {
+        mana = Math.min(mana + value, maxMana);
+    }
+
+    public void consumeMana(int value) {
+        mana -= value;
     }
 
     public void heal(int value) {
