@@ -31,7 +31,7 @@ public class CardParser {
         String[] args = string.split(",");
 
         // Número de argumentos inválido
-        if (args.length != 6) {
+        if (args.length > 8 || args.length < 6) {
             return null;
         }
 
@@ -58,8 +58,9 @@ public class CardParser {
         int manaCost = Integer.parseInt(args[2]);
         CardElement cardElement = CardElement.fromString(args[3]);
         Integer power = Integer.valueOf(args[4]);
-        String description = args[5];
+        Integer directDamage = Integer.valueOf(args[5]);
+        String description = args[6];
 
-        return new Card(name, manaCost, cardElement, power, description);
+        return new Card(name, manaCost, cardElement, power, directDamage, description);
     }
 }

@@ -14,6 +14,7 @@ public class Card {
     // Carta de Poder
     CardElement cardElement;
     Integer power;
+    Integer directDamage;
 
     // Carta de Efeito
     CardEffect cardEffect;
@@ -33,12 +34,13 @@ public class Card {
         this.cardTypeSprite = loadTypeSprite();
     }
 
-    public Card(String name, int manaCost, CardElement cardElement, Integer Power, String description) {
+    public Card(String name, int manaCost, CardElement cardElement, Integer power, Integer directDamage, String description) {
         this.name = name;
         this.manaCost = manaCost;
         this.cardType = CardType.POWER;
         this.cardElement = cardElement;
-        this.power = Power;
+        this.power = power;
+        this.directDamage = directDamage;
         this.description = description;
         this.cardTypeSprite = loadTypeSprite();
         this.cardElementSprite = loadElementSprite();
@@ -101,6 +103,10 @@ public class Card {
 
     public Integer getPower() {
         return power;
+    }
+
+    public Integer getDirectDamage() {
+        return directDamage;
     }
 
     public CardEffect getCardEffect() {

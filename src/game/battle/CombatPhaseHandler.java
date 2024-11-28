@@ -1,11 +1,7 @@
 package game.battle;
 
 import game.cards.Card;
-import game.cards.CardEffect;
 import game.entity.PlayerEntity;
-
-import java.sql.SQLOutput;
-import java.util.List;
 
 public class CombatPhaseHandler {
 
@@ -34,21 +30,21 @@ public class CombatPhaseHandler {
                 battleMessageHandler.sendMessage("Empate!");
 
             } else if (firstPlayerTotalPower > secondPlayerTotalPower) {
-                secondPlayer.receiveDamage(1);
+                secondPlayer.receiveDamage(firstPlayerCard.getDirectDamage());
 
                 String[] messages = {
                     firstPlayer.getName() + " atacou com " + firstPlayerCard.getName() + " e venceu a rodada!",
-                    secondPlayer.getName() + " recebeu 1 de dano."
+                    secondPlayer.getName() + " recebeu "+ firstPlayerCard.getDirectDamage() + " de dano."
                 };
 
                 battleMessageHandler.sendMessage(messages);
 
             } else {
-                firstPlayer.receiveDamage(1);
+                firstPlayer.receiveDamage(secondPlayerCard.getDirectDamage());
 
                 String[] messages = {
                         secondPlayer.getName() + " atacou com " + secondPlayerCard.getName() + " e venceu a rodada!",
-                        firstPlayer.getName() + " recebeu 1 de dano."
+                        firstPlayer.getName() + " recebeu " + secondPlayerCard.getDirectDamage() +" de dano."
                 };
 
                 battleMessageHandler.sendMessage(messages);
@@ -63,21 +59,21 @@ public class CombatPhaseHandler {
         }
 
         if (firstPlayerCard == null) {
-            firstPlayer.receiveDamage(1);
+            firstPlayer.receiveDamage(secondPlayerCard.getDirectDamage());
             String[] messages = {
                     secondPlayer.getName() + " atacou com " + secondPlayerCard.getName(),
                     firstPlayer.getName() + " não colocou nenhuma carta em campo." ,
-                    firstPlayer.getName() + " recebeu 1 de dano."
+                    firstPlayer.getName() + " recebeu "+ secondPlayerCard.getDirectDamage() +" de dano."
             };
             battleMessageHandler.sendMessage(messages);
         }
 
         if (secondPlayerCard == null) {
-            secondPlayer.receiveDamage(1);
+            secondPlayer.receiveDamage(firstPlayerCard.getDirectDamage());
             String[] messages = {
                     firstPlayer.getName() + " atacou com " + firstPlayerCard.getName(),
                     secondPlayer.getName() + " não colocou nenhuma carta em campo." ,
-                    secondPlayer.getName() + " recebeu 1 de dano."
+                    secondPlayer.getName() + " recebeu "+ firstPlayerCard.getDirectDamage() + " de dano."
             };
             battleMessageHandler.sendMessage(messages);
         }
