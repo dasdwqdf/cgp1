@@ -19,7 +19,7 @@ public class Menu extends UI {
     int menuX;
     int menuY;
     int borderSize;
-
+    boolean borderVisible = true;
 
     public Menu(GamePanel gamePanel) {
         super(gamePanel);
@@ -36,17 +36,25 @@ public class Menu extends UI {
     }
 
     public void drawMenuWindow(Graphics2D g2d) {
-        // Retangulo de shadow
-        g2d.setColor(shadowColor);
-        g2d.fillRoundRect(menuX +10, menuY +10, menuWidth, menuHeight, 10, 10);
+
+        if(borderVisible) {
+            // Retangulo de shadow
+            g2d.setColor(shadowColor);
+            g2d.fillRoundRect(menuX +10, menuY +10, menuWidth, menuHeight, 10, 10);
+
+
+        }
 
         // Retangulo principal
         g2d.setColor(menuColor);
         g2d.fillRoundRect(menuX, menuY, menuWidth, menuHeight, 10, 10);
 
-        // Borda do Retangulo
-        g2d.setColor(borderColor);
-        g2d.setStroke(new BasicStroke(borderSize));
-        g2d.drawRoundRect(menuX + borderSize, menuY + borderSize, menuWidth -10, menuHeight -10, 10, 10);
+        if (borderVisible) {
+            // Borda do Retangulo
+            g2d.setColor(borderColor);
+            g2d.setStroke(new BasicStroke(borderSize));
+            g2d.drawRoundRect(menuX + borderSize, menuY + borderSize, menuWidth -10, menuHeight -10, 10, 10);
+        }
+
     }
 }

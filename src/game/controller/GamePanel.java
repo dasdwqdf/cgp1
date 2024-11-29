@@ -4,11 +4,14 @@ import ui.BattleMenuUI;
 import game.states.GameState;
 import game.input.KeyHandler;
 import ui.MainMenuUI;
+import utils.StatusSprites;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GamePanel extends JPanel implements Runnable {
+
+    public final StatusSprites statusSprites = new StatusSprites();
 
     // Configurações da Tela
     public final int originalTileSize = 16; // 16x16 tile

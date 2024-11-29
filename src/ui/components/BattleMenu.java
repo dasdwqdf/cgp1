@@ -15,7 +15,9 @@ import java.util.List;
 public class BattleMenu extends Menu {
 
     Battle battle;
-    CardDescriptionMenu cardDescriptionMenu;
+    PlayerMenu playerMenu;
+    PlayerMenu opponentMenu;
+    CardMenu cardMenu;
     BattleMenuController battleMenuController;
     Integer animationCounter = 0;
 
@@ -25,7 +27,16 @@ public class BattleMenu extends Menu {
         battle.startBattle();
         initBattleMenuDefaultValues();
         battleMenuController = new BattleMenuController(gamePanel.keyHandler, battle);
-        cardDescriptionMenu = new CardDescriptionMenu(gamePanel, battleMenuController);
+        cardMenu = new CardMenu(gamePanel, battleMenuController);
+        initPlayersMenus();
+    }
+
+    private void initPlayersMenus() {
+        PlayerEntity player = battle.getPlayers().get(0);
+        PlayerEntity opponent = battle.getPlayers().get(1);
+
+        playerMenu = new PlayerMenu(gamePanel, PlayerMenuType.PLAYER, player);
+        opponentMenu = new PlayerMenu(gamePanel, PlayerMenuType.OPPONENT, opponent);
     }
 
     private void initBattleMenuDefaultValues() {
@@ -46,7 +57,8 @@ public class BattleMenu extends Menu {
     @Override
     public void draw(Graphics2D g2d) {
         drawMenuWindow(g2d);
-        drawPlayersStatus(g2d);
+        playerMenu.draw(g2d);
+        opponentMenu.draw(g2d);
 
         switch (battleMenuController.getCurrentMode()) {
             case SELECT_OPTION :
@@ -57,7 +69,7 @@ public class BattleMenu extends Menu {
             case SELECT_CARD:
                 drawHand(g2d, battleMenuController.getPlayerHand());
                 drawCardCursor(g2d);
-                cardDescriptionMenu.draw(g2d);
+                cardMenu.draw(g2d);
                 break;
 
             case MESSAGE:

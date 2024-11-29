@@ -23,8 +23,6 @@ public class Card {
     // Sprites
     BufferedImage cardTypeSprite;
     BufferedImage cardElementSprite;
-    BufferedImage cardManaSprite;
-    BufferedImage cardDirectDamageSprite;
 
     public Card(String name, int manaCost, CardEffect cardEffect, Integer effectArg, String description) {
         this.name = name;
@@ -34,7 +32,6 @@ public class Card {
         this.effectArg = effectArg;
         this.description = description;
         this.cardTypeSprite = loadTypeSprite();
-        this.cardManaSprite = loadManaSprite();
     }
 
     public Card(String name, int manaCost, CardElement cardElement, Integer power, Integer directDamage, String description) {
@@ -47,8 +44,6 @@ public class Card {
         this.description = description;
         this.cardTypeSprite = loadTypeSprite();
         this.cardElementSprite = loadElementSprite();
-        this.cardManaSprite = loadManaSprite();
-        this.cardDirectDamageSprite = loadDirectDamageSprite();
     }
 
     private BufferedImage loadTypeSprite() {
@@ -75,34 +70,6 @@ public class Card {
             case WATER -> "/card-element/water.png";
             case GRASS -> "/card-element/grass.png";
         };
-
-        try {
-            image = ImageIO.read(getClass().getResource(urlImage));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return image;
-    }
-
-    private BufferedImage loadManaSprite() {
-        BufferedImage image = null;
-        String urlImage = "/mana/filled-mana.png";
-
-        try {
-            image = ImageIO.read(getClass().getResource(urlImage));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return image;
-    }
-
-    private BufferedImage loadDirectDamageSprite() {
-        BufferedImage image = null;
-        String urlImage = "/card-direct-damage/direct-damage.png";
 
         try {
             image = ImageIO.read(getClass().getResource(urlImage));
@@ -156,14 +123,6 @@ public class Card {
 
     public BufferedImage getCardElementSprite() {
         return cardElementSprite;
-    }
-
-    public BufferedImage getCardManaSprite() {
-        return cardManaSprite;
-    }
-
-    public BufferedImage getCardDirectDamageSprite() {
-        return cardDirectDamageSprite;
     }
 
     @Override

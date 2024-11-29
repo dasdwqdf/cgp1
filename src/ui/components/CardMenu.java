@@ -4,23 +4,26 @@ import game.cards.Card;
 import game.cards.CardType;
 import game.controller.GamePanel;
 import ui.controllers.BattleMenuController;
+import utils.StatusSprites;
 import utils.Utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class CardDescriptionMenu extends Menu {
+public class CardMenu extends Menu {
 
+    StatusSprites statusSprites;
     BattleMenuController battleMenuController;
     Font cardDescriptionFont = menuFont.deriveFont(24f);
 
-    public CardDescriptionMenu(GamePanel gamePanel, BattleMenuController battleMenuController) {
+    public CardMenu(GamePanel gamePanel, BattleMenuController battleMenuController) {
         super(gamePanel);
-        initCardDescriptionMenuDefaultValues();
+        initCardMenuDefaultValues();
         this.battleMenuController = battleMenuController;
+        this.statusSprites = gamePanel.statusSprites;
     }
 
-    private void initCardDescriptionMenuDefaultValues() {
+    private void initCardMenuDefaultValues() {
         menuWidth = gamePanel.screenWidth/3;
         menuHeight = 3 * gamePanel.tileSize;
         menuX = gamePanel.screenWidth/2 + 2 * gamePanel.tileSize - 16;
@@ -62,7 +65,7 @@ public class CardDescriptionMenu extends Menu {
 
             // Dano Direto
             tempX += (int) (menuWidth/3.5);
-            BufferedImage directDamageSprite = currentSelectedCard.getCardDirectDamageSprite();
+            BufferedImage directDamageSprite = statusSprites.getDirectDamage();
             g2d.drawImage(directDamageSprite, tempX, tempY - gamePanel.tileSize/2, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
 
             Color directDamageColor = new Color(225, 80, 20);
@@ -75,7 +78,7 @@ public class CardDescriptionMenu extends Menu {
         }
 
         // Custo de Mana
-        BufferedImage cardManaCostSprite = currentSelectedCard.getCardManaSprite();
+        BufferedImage cardManaCostSprite = statusSprites.getFilledMana();
         g2d.drawImage(cardManaCostSprite, tempX, tempY - gamePanel.tileSize/2, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
 
         Color manaCostColor = new Color(0, 173, 201);
@@ -123,5 +126,4 @@ public class CardDescriptionMenu extends Menu {
         drawCardStatus(g2d, currentSelectedCard);
         drawCardDescription(g2d, currentSelectedCard);
     }
-
 }
