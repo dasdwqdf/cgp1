@@ -55,13 +55,41 @@ public class PlayerMenu extends Menu {
     }
 
     public void drawPlayerStatus(Graphics2D g2d) {
+        // Coordenadas
         int tempX = menuX + gamePanel.tileSize/2;
-        int tempY = menuY + gamePanel.tileSize;
+        int tempY = menuY + gamePanel.tileSize + 8;
 
+        // Sprite
         BufferedImage heartSprite = statusSprites.getHeart();
+        g2d.drawImage(heartSprite, tempX, tempY - gamePanel.tileSize/2, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
+
+        // Texto
+        Color hpColor = Color.RED;
+        String hpText = String.valueOf(player.getHp());
+
+        g2d.setColor(hpColor);
+        g2d.drawString(hpText, tempX + gamePanel.tileSize/2 + 4, tempY);
+
+        // Sprite Mana
+        tempX += (int) (menuWidth/4);
+        BufferedImage filledManaSprite = statusSprites.getFilledMana();
+        BufferedImage emptyManaSprite = statusSprites.getEmptyMana();
+
+
+        for (int i = 0; i < PlayerEntity.maxMana; i++) {
+            if (i < player.getMana()) {
+                g2d.drawImage(filledManaSprite, tempX, tempY - gamePanel.tileSize/2, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
+            } else {
+                g2d.drawImage(emptyManaSprite, tempX, tempY - gamePanel.tileSize/2, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
+            }
+
+            tempX += gamePanel.tileSize/2 + 4;
+        }
+
     }
 
     public void drawPlayer(Graphics2D g2d) {
         drawPlayerName(g2d);
+        drawPlayerStatus(g2d);
     }
 }
