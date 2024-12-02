@@ -18,7 +18,7 @@ public class BattleMenuUI extends UI {
 
     public void newBattle() {
         this.battle = new Battle();
-        battleMenu = new BattleMenu(gamePanel, battle);
+        this.battleMenu = new BattleMenu(gamePanel, battle);
     }
 
 

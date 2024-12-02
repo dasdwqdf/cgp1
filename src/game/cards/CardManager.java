@@ -10,7 +10,7 @@ public class CardManager {
     List<Card> hand;
     List<Card> discard;
 
-    final int handMaxCards = 6;
+    public final int handMaxCards = 6;
 
     public CardManager() {
         deck = new ArrayList<Card>();
@@ -57,7 +57,7 @@ public class CardManager {
 
     public int drawCards(int numCards) {
         int drawnCards = 0;
-        while (!isDeckEmpty() && numCards > 0 && hand.size() < handMaxCards) {
+        while (!isDeckEmpty() && numCards > 0) {
             Card card = deck.remove(0);
             hand.add(card);
             drawnCards++;
@@ -65,6 +65,7 @@ public class CardManager {
         }
         return drawnCards;
     }
+
 
     public int discardCards(int numCards) {
         int numDiscardedCards = 0;

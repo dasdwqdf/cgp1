@@ -24,18 +24,18 @@ public class BattleMenu extends Menu {
     public BattleMenu(GamePanel gamePanel, Battle battle) {
         super(gamePanel);
         this.battle = battle;
+        this.battleMenuController = new BattleMenuController(gamePanel.keyHandler, battle);
+        this.cardMenu = new CardMenu(gamePanel, battleMenuController);
+        battle.setBattleMenuController(battleMenuController);
         battle.startBattle();
         initBattleMenuDefaultValues();
-        battleMenuController = new BattleMenuController(gamePanel.keyHandler, battle);
-        cardMenu = new CardMenu(gamePanel, battleMenuController);
         initPlayersMenus();
     }
 
     private void initPlayersMenus() {
         PlayerEntity player = battle.getPlayers().get(0);
-        PlayerEntity opponent = battle.getPlayers().get(1);
-
         playerMenu = new PlayerMenu(gamePanel, PlayerMenuType.PLAYER, player);
+        PlayerEntity opponent = battle.getPlayers().get(1);
         opponentMenu = new PlayerMenu(gamePanel, PlayerMenuType.OPPONENT, opponent);
     }
 
@@ -66,7 +66,7 @@ public class BattleMenu extends Menu {
                 drawBattleOptionCursor(g2d);
                 break;
 
-            case SELECT_CARD:
+            case SELECT_CARD, SELECT_DISCARD:
                 drawHand(g2d, battleMenuController.getPlayerHand());
                 drawCardCursor(g2d);
                 cardMenu.draw(g2d);

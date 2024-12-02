@@ -4,35 +4,38 @@ import game.cards.*;
 import game.entity.AiEntity;
 import game.entity.ControllableEntity;
 import game.entity.PlayerEntity;
+import ui.components.BattleMenu;
+import ui.controllers.BattleMenuController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Battle {
 
-    BattleState battleState;
+    BattleMenuController battleMenuController;
 
+    BattleState battleState;
     List<PlayerEntity> players;
+    Card[] fieldCards;
+    List<Card> firstPlayerEffects, secondPlayerEffects;
 
     int currentTurn;
     int currentPlayerIndex;
-    Card[] fieldCards;
-    List<Card> firstPlayerEffects, secondPlayerEffects;
 
     BattleMessageHandler battleMessageHandler;
     CombatPhaseHandler combatPhaseHandler;
     EffectHandler effectHandler;
 
     public Battle() {
-        // Estado da Batalha
+        // estado da batalha
         battleState = BattleState.IN_PROGRESS;
 
-        // Jogadores
+        // inicializamos os jogadores
         players = new ArrayList<>();
         players.add(new ControllableEntity("NOYUR", 6, 0, "deck01.txt"));
         players.add(new AiEntity("BOT", 6, 0,"deck01.txt"));
 
-        // Outras variáveis
+        // inicialização de outras variáveis
         this.currentTurn = 0;
         this.currentPlayerIndex = 0;
         this.fieldCards = new Card[2];
@@ -44,80 +47,22 @@ public class Battle {
     }
 
     public void startBattle() {
-        // Entidades
+        // entidades
         PlayerEntity firstPlayer = players.get(0);
         PlayerEntity secondPlayer = players.get(1);
 
-        // Embaralha o baralho de ambos os jogadores e
+        // shuffle no baralho de ambos jogadores e compra 5 cartas
         for (PlayerEntity player : players) {
             player.getCardManager().shuffleDeck();
-            player.getCardManager().drawCards(6);
+            player.getCardManager().drawCards(5);
         }
 
-        // Mensagem de início de Batalha
-        String[] messages = {
-                "Batalha iniciada entre " + firstPlayer.getName() + " e " + secondPlayer.getName() + ".",
-                "Ambos jogadores compraram 6 cartas."
-        };
+        // mensagem de início de batalha
+        String message = "Batalha iniciada entre " + firstPlayer.getName() + " e " + secondPlayer.getName() + ".";
+        battleMessageHandler.sendMessage(message);
 
-        battleMessageHandler.sendMessage(messages);
-
-        // Inicia o turno do jogador
+        // inicia o turno do jogador
         startPlayerTurn();
-    }
-
-    public boolean playCard(Card card) {
-        // Pega o jogador atual
-        PlayerEntity currentPlayer = players.get(currentPlayerIndex);
-        CardManager cardManager = currentPlayer.getCardManager();
-
-        // Mana do jogador insuficiente para utilizar a carta
-        if (card.getManaCost() > currentPlayer.getMana()) {
-            // Mensagem caso o jogador atual seja uma entidade controlável
-            if (currentPlayer instanceof ControllableEntity) {
-                battleMessageHandler.sendMessage("Mana insuficiente para utilizar " + card.getName() + ".");
-            }
-            return false;
-        }
-
-        switch (card.getCardType()) {
-            case POWER:
-                // Carta atual em campo
-                Card currentPlayerFieldCard = fieldCards[currentPlayerIndex];
-
-                // Caso já exista uma carta em campo para o jogador atual, retornamos
-                if (currentPlayerFieldCard != null) {
-                    if (currentPlayer instanceof ControllableEntity) {
-                        battleMessageHandler.sendMessage("Não foi possível colocar " + card.getName() + ", pois " + currentPlayerFieldCard.getName() + " já está em campo.");
-                    }
-                    return false;
-                }
-
-                // Caso não exista uma carta em campo, consumimos a carta
-                fieldCards[currentPlayerIndex] = card;
-                cardManager.useCard(card);
-
-                // Consumimos a mana do jogador
-                currentPlayer.consumeMana(card.getManaCost());
-
-                // Mensagem de carta em campo
-                battleMessageHandler.sendMessage(currentPlayer.getName() + " colocou " + card.getName() + " em campo.");
-
-                return true;
-
-            case EFFECT:
-                // Retiramos a carta da mão do jogador e consumimos a mana
-                cardManager.useCard(card);
-                currentPlayer.consumeMana(card.getManaCost());
-
-                // Aplicamos o efeito utilizando o handler de efeitos
-                effectHandler.handleEffect(currentPlayer, currentPlayerIndex, card);
-
-                return true;
-
-            default:
-                return false;
-        }
     }
 
     public void handleTurnStart(PlayerEntity currentPlayer) {
@@ -135,6 +80,23 @@ public class Battle {
             // Mensagem de compra de cartas
             battleMessageHandler.sendMessage(currentPlayer.getName() + " comprou " + drawnCards + " cartas(s) do baralho.");
         }
+
+        // lidamos com o descarte de cartas extras
+        handleDiscard(currentPlayer);
+    }
+
+    public void handleDiscard(PlayerEntity currentPlayer) {
+        // gerenciador de cartas do jogador atual
+        CardManager currentPlayerCardManager = currentPlayer.getCardManager();
+
+        int handSize = currentPlayerCardManager.getHand().size();
+        int maxHandSize = currentPlayerCardManager.handMaxCards;
+
+        // verificamos se o número de cartas do jogador excede o tamanho da mão
+        if (handSize > maxHandSize) {
+            battleMessageHandler.sendMessage("Sua mão está cheia, selecione uma carta para descartar.");
+        }
+
     }
 
     public void startPlayerTurn() {
@@ -196,6 +158,74 @@ public class Battle {
         }
     }
 
+    public boolean playCard(Card card) {
+        // Pega o jogador atual
+        PlayerEntity currentPlayer = players.get(currentPlayerIndex);
+        CardManager cardManager = currentPlayer.getCardManager();
+
+        // Mana do jogador insuficiente para utilizar a carta
+        if (card.getManaCost() > currentPlayer.getMana()) {
+            // Mensagem caso o jogador atual seja uma entidade controlável
+            if (currentPlayer instanceof ControllableEntity) {
+                battleMessageHandler.sendMessage("Mana insuficiente para utilizar " + card.getName() + ".");
+            }
+            return false;
+        }
+
+        switch (card.getCardType()) {
+            case POWER:
+                // Carta atual em campo
+                Card currentPlayerFieldCard = fieldCards[currentPlayerIndex];
+
+                // Caso já exista uma carta em campo para o jogador atual, retornamos
+                if (currentPlayerFieldCard != null) {
+                    if (currentPlayer instanceof ControllableEntity) {
+                        battleMessageHandler.sendMessage("Não foi possível colocar " + card.getName() + ", pois " + currentPlayerFieldCard.getName() + " já está em campo.");
+                    }
+                    return false;
+                }
+
+                // Caso não exista uma carta em campo, consumimos a carta
+                fieldCards[currentPlayerIndex] = card;
+                cardManager.useCard(card);
+
+                // Consumimos a mana do jogador
+                currentPlayer.consumeMana(card.getManaCost());
+
+                // Mensagem de carta em campo
+                battleMessageHandler.sendMessage(currentPlayer.getName() + " colocou " + card.getName() + " em campo.");
+
+                return true;
+
+            case EFFECT:
+                // Retiramos a carta da mão do jogador e consumimos a mana
+                cardManager.useCard(card);
+                currentPlayer.consumeMana(card.getManaCost());
+
+                // Aplicamos o efeito utilizando o handler de efeitos
+                effectHandler.handleEffect(currentPlayer, currentPlayerIndex, card);
+
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    public void discardCard(Card card) {
+        PlayerEntity currentPlayer = players.get(currentPlayerIndex);
+        CardManager cardManager = currentPlayer.getCardManager();
+
+        // descartamos a carta selecionada
+        cardManager.useCard(card);
+
+        // mensagem de descarte
+        String message = currentPlayer.getName() + " descartou " + card.getName() + ".";
+        battleMessageHandler.sendMessage(message);
+
+        battleMenuController.setCurrentMode(BattleMenuController.BattleMenuMode.MESSAGE);
+    }
+
     public void updateCurrentPlayerIndex() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
     }
@@ -230,10 +260,6 @@ public class Battle {
         combatPhaseHandler.handleCombatPhase(firstPlayer, secondPlayer, firstPlayerCard, secondPlayerCard);
     }
 
-    public boolean bothPlayersCompletedRound() {
-        return currentPlayerIndex + 1 == players.size();
-    }
-
     private List<PlayerEntity> getPlayerEntities() {
         return players;
     }
@@ -244,6 +270,19 @@ public class Battle {
 
     public BattleMessageHandler getBattleMessageHandler() {
         return battleMessageHandler;
+    }
+
+    public void setBattleMenuController(BattleMenuController battleMenuController) {
+        // linkamos o controller
+        this.battleMenuController = battleMenuController;
+
+        // handler de mensagens
+        battleMenuController.setBattleMessageHandler(battleMessageHandler);
+
+        // mão do jogador
+        PlayerEntity firstPlayer = players.get(0);
+        List<Card> hand = firstPlayer.getCardManager().getHand();
+        battleMenuController.setPlayerHand(hand);
     }
 
     public BattleState getBattleState() {

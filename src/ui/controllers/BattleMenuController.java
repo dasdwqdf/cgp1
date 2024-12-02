@@ -11,38 +11,35 @@ import java.util.List;
 public class BattleMenuController {
 
     Battle battle;
-
-    // Handler de Input's
     KeyHandler keyHandler;
 
     public enum BattleMenuMode {
         SELECT_OPTION,
         SELECT_CARD,
+        SELECT_DISCARD,
         MESSAGE
     }
-
     public enum BattleMenuOption {
         MAO,
         CHECAR,
         ENCERRAR
     }
 
-    // Variaveis de controle de menu
-    BattleMenuMode currentMode = BattleMenuMode.MESSAGE;
-    BattleMenuOption currentOption = BattleMenuOption.MAO;
-    Integer currentSelectedCardIndex = 0;
+    BattleMenuMode currentMode;
+    BattleMenuOption currentOption;
+    Integer currentSelectedCardIndex;
 
-    // Variaveis auxiliares
-    int handSize;
     List<Card> playerHand;
+    Integer handSize;
+    Integer handMaxSize = 6;
     BattleMessageHandler battleMessageHandler;
 
     public BattleMenuController(KeyHandler keyHandler, Battle battle) {
         this.keyHandler = keyHandler;
         this.battle = battle;
-        this.playerHand = battle.getPlayers().get(0).getCardManager().getHand();
-        this.handSize = playerHand.size();
-        this.battleMessageHandler = battle.getBattleMessageHandler();
+        this.currentMode = BattleMenuMode.MESSAGE;
+        this.currentOption = BattleMenuOption.MAO;
+        this.currentSelectedCardIndex = 0;
     }
 
     public void update() {
@@ -55,14 +52,14 @@ public class BattleMenuController {
                 handleSelectCard();
                 break;
 
+            case SELECT_DISCARD:
+                handleDiscardCard();
+                break;
+
             case MESSAGE:
                 handleMessage();
                 break;
         }
-    }
-
-    public boolean isGameOver() {
-        return battle.getBattleState().equals(BattleState.FINISHED) && !currentMode.equals(BattleMenuController.BattleMenuMode.MESSAGE);
     }
 
     private void handleSelectCard() {
@@ -87,6 +84,29 @@ public class BattleMenuController {
 
             keyHandler.xPressed = false;
         }
+    }
+
+    private void handleDiscardCard() {
+        if (keyHandler.rightPressed) {
+            currentSelectedCardIndex = (currentSelectedCardIndex < handSize-1) ? currentSelectedCardIndex + 1 : 0;
+            keyHandler.rightPressed = false;
+
+        } else if (keyHandler.leftPressed) {
+            currentSelectedCardIndex = (currentSelectedCardIndex > 0) ? currentSelectedCardIndex - 1 : handSize-1;
+            keyHandler.leftPressed = false;
+
+        } else if (keyHandler.xPressed) {
+            Card currentCard = playerHand.get(currentSelectedCardIndex);
+            battle.discardCard(currentCard);
+            handSize = playerHand.size();
+            currentSelectedCardIndex = 0;
+
+            keyHandler.xPressed = false;
+        }
+    }
+
+    public void setCurrentMode(BattleMenuMode mode) {
+        this.currentMode = mode;
     }
 
     private void handleSelectOption() {
@@ -127,21 +147,31 @@ public class BattleMenuController {
     }
 
     private void handleMessage() {
-
         if (battleMessageHandler.isEmpty()) {
             currentMode = BattleMenuMode.SELECT_OPTION;
         }
 
         if (keyHandler.xPressed) {
             if (battleMessageHandler.size() == 1) {
-                currentOption = BattleMenuOption.MAO;
-                currentMode = BattleMenuMode.SELECT_OPTION;
                 handSize = playerHand.size();
+                currentSelectedCardIndex = 0;
+
+                if (handSize > 6) {
+                    currentMode = BattleMenuMode.SELECT_DISCARD;
+                } else {
+                    currentOption = BattleMenuOption.MAO;
+                    currentMode = BattleMenuMode.SELECT_OPTION;
+                }
+
             }
 
             battleMessageHandler.consumeMessage();
             keyHandler.xPressed = false;
         }
+    }
+
+    public boolean isGameOver() {
+        return battle.getBattleState().equals(BattleState.FINISHED);
     }
 
     public BattleMenuOption getCurrentOption() {
@@ -156,11 +186,15 @@ public class BattleMenuController {
         return currentSelectedCardIndex;
     }
 
-    public int getHandSize() {
-        return handSize;
-    }
-
     public List<Card> getPlayerHand() {
         return playerHand;
+    }
+
+    public void setPlayerHand(List<Card> playerHand) {
+        this.playerHand = playerHand;
+    }
+
+    public void setBattleMessageHandler(BattleMessageHandler battleMessageHandler) {
+        this.battleMessageHandler = battleMessageHandler;
     }
 }
