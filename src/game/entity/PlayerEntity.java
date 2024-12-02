@@ -41,12 +41,16 @@ public abstract class PlayerEntity {
 
     public abstract Card selectBestCard();
 
+    public abstract Card selectBestDiscardCard();
+
     public int getMana() {
         return mana;
     }
+
     public void setMana(int mana) {
         this.mana = mana;
     }
+
     public String getName() {
         return name;
     }

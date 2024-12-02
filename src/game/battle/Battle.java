@@ -4,7 +4,6 @@ import game.cards.*;
 import game.entity.AiEntity;
 import game.entity.ControllableEntity;
 import game.entity.PlayerEntity;
-import ui.components.BattleMenu;
 import ui.controllers.BattleMenuController;
 
 import java.util.ArrayList;
@@ -90,11 +89,22 @@ public class Battle {
         CardManager currentPlayerCardManager = currentPlayer.getCardManager();
 
         int handSize = currentPlayerCardManager.getHand().size();
-        int maxHandSize = currentPlayerCardManager.handMaxCards;
 
         // verificamos se o número de cartas do jogador excede o tamanho da mão
-        if (handSize > maxHandSize) {
-            battleMessageHandler.sendMessage("Sua mão está cheia, selecione uma carta para descartar.");
+        if (handSize > CardManager.handMaxSize) {
+
+            if (currentPlayer instanceof AiEntity) {
+                while (handSize > CardManager.handMaxSize) {
+                    Card discardCard = currentPlayer.selectBestDiscardCard();
+                    discardCard(discardCard);
+                    handSize = currentPlayerCardManager.getHand().size();
+                }
+
+            } else {
+                battleMessageHandler.sendMessage("Sua mão está cheia, selecione uma carta para descartar.");
+            }
+
+
         }
 
     }
@@ -232,7 +242,7 @@ public class Battle {
 
     public void updateBattleState() {
         for (PlayerEntity player : players) {
-            if (player.getHp() == 0) {
+            if (player.getHp() < 1) {
                 battleState = BattleState.FINISHED;
                 battleMessageHandler.sendMessage("Batalha finalizada!");
             }

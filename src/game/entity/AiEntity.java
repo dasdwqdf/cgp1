@@ -23,4 +23,15 @@ public class AiEntity extends PlayerEntity {
 
         return bestCard;
     }
+
+    @Override
+    public Card selectBestDiscardCard() {
+        return getRandomCard();
+    }
+
+    public Card getRandomCard() {
+        int randomCardIndex = (int) (Math.random() * getCardManager().getHand().size());
+        return getCardManager().getHand().get(randomCardIndex);
+    }
+
 }

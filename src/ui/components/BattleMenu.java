@@ -2,6 +2,7 @@ package ui.components;
 
 import game.battle.Battle;
 import game.cards.Card;
+import game.cards.CardManager;
 import game.controller.GamePanel;
 import game.entity.PlayerEntity;
 import game.states.GameState;
@@ -49,7 +50,7 @@ public class BattleMenu extends Menu {
 
     public void update(){
         battleMenuController.update();
-        if (battleMenuController.isGameOver()) {
+        if (battleMenuController.gameOver) {
             gamePanel.gameState = GameState.TITLE_STATE;
         }
     }
@@ -123,7 +124,10 @@ public class BattleMenu extends Menu {
     }
 
     public void drawHand(Graphics2D g2d, List<Card> hand) {
-        for (int i = 0; i < hand.size(); i++) {
+
+        int size = Math.min(hand.size(), CardManager.handMaxSize);
+
+        for (int i = 0; i < size; i++) {
             Card card = hand.get(i);
             drawCard(g2d, card, i);
         }

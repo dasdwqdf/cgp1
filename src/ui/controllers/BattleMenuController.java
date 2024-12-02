@@ -10,6 +10,8 @@ import java.util.List;
 
 public class BattleMenuController {
 
+    public boolean gameOver = false;
+
     Battle battle;
     KeyHandler keyHandler;
 
@@ -31,7 +33,6 @@ public class BattleMenuController {
 
     List<Card> playerHand;
     Integer handSize;
-    Integer handMaxSize = 6;
     BattleMessageHandler battleMessageHandler;
 
     public BattleMenuController(KeyHandler keyHandler, Battle battle) {
@@ -153,21 +154,29 @@ public class BattleMenuController {
 
         if (keyHandler.xPressed) {
             if (battleMessageHandler.size() == 1) {
-                handSize = playerHand.size();
-                currentSelectedCardIndex = 0;
-
-                if (handSize > 6) {
-                    currentMode = BattleMenuMode.SELECT_DISCARD;
-                } else {
-                    currentOption = BattleMenuOption.MAO;
-                    currentMode = BattleMenuMode.SELECT_OPTION;
-                }
-
+                handleGameOver();
+                handleDiscard();
             }
 
             battleMessageHandler.consumeMessage();
             keyHandler.xPressed = false;
         }
+    }
+
+    private void handleDiscard() {
+        handSize = playerHand.size();
+        currentSelectedCardIndex = 0;
+
+        if (handSize > 6) {
+            currentMode = BattleMenuMode.SELECT_DISCARD;
+        } else {
+            currentOption = BattleMenuOption.MAO;
+            currentMode = BattleMenuMode.SELECT_OPTION;
+        }
+    }
+
+    private void handleGameOver() {
+        gameOver = isGameOver();
     }
 
     public boolean isGameOver() {

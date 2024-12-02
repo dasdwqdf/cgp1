@@ -10,7 +10,7 @@ public class CardManager {
     List<Card> hand;
     List<Card> discard;
 
-    public final int handMaxCards = 6;
+    public final static int handMaxSize = 6;
 
     public CardManager() {
         deck = new ArrayList<Card>();
@@ -95,7 +95,7 @@ public class CardManager {
                 "deck=" + deck +
                 ", hand=" + hand +
                 ", discard=" + discard +
-                ", handMaxCards=" + handMaxCards +
+                ", handMaxCards=" + handMaxSize +
                 '}';
     }
 }

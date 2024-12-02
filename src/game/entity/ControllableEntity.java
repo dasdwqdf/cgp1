@@ -11,4 +11,9 @@ public class ControllableEntity extends PlayerEntity {
     public Card selectBestCard() {
         return null;
     }
+
+    @Override
+    public Card selectBestDiscardCard() {
+        return null;
+    }
 }
