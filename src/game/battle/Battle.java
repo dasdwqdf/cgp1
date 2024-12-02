@@ -8,6 +8,8 @@ import ui.controllers.BattleMenuController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Battle {
 
@@ -31,13 +33,12 @@ public class Battle {
 
         // inicializamos os jogadores
         players = new ArrayList<>();
-        players.add(new ControllableEntity("NOYUR", 6, 0, "deck01.txt"));
+        players.add(new ControllableEntity("JOGADOR", 6, 0, "deck01.txt"));
         players.add(new AiEntity("BOT", 6, 0,"deck01.txt"));
 
         // inicialização de outras variáveis
         this.currentTurn = 0;
         this.currentPlayerIndex = 0;
-        this.fieldCards = new Card[2];
         this.firstPlayerEffects = new ArrayList<>();
         this.secondPlayerEffects = new ArrayList<>();
         this.battleMessageHandler = new BattleMessageHandler();
@@ -103,8 +104,6 @@ public class Battle {
             } else {
                 battleMessageHandler.sendMessage("Sua mão está cheia, selecione uma carta para descartar.");
             }
-
-
         }
 
     }
@@ -184,10 +183,10 @@ public class Battle {
 
         switch (card.getCardType()) {
             case POWER:
-                // Carta atual em campo
-                Card currentPlayerFieldCard = fieldCards[currentPlayerIndex];
+                // carta atual em campo
+                Card currentPlayerFieldCard = currentPlayer.getFieldCard();
 
-                // Caso já exista uma carta em campo para o jogador atual, retornamos
+                // caso já exista uma carta em campo para o jogador atual, retornamos
                 if (currentPlayerFieldCard != null) {
                     if (currentPlayer instanceof ControllableEntity) {
                         battleMessageHandler.sendMessage("Não foi possível colocar " + card.getName() + ", pois " + currentPlayerFieldCard.getName() + " já está em campo.");
@@ -195,25 +194,25 @@ public class Battle {
                     return false;
                 }
 
-                // Caso não exista uma carta em campo, consumimos a carta
-                fieldCards[currentPlayerIndex] = card;
+                // caso não exista uma carta em campo, utilizamos a carta
+                currentPlayer.setFieldCard(card);
                 cardManager.useCard(card);
 
-                // Consumimos a mana do jogador
+                // consumimos a mana do jogador
                 currentPlayer.consumeMana(card.getManaCost());
 
-                // Mensagem de carta em campo
+                // mensagem de carta em campo
                 battleMessageHandler.sendMessage(currentPlayer.getName() + " colocou " + card.getName() + " em campo.");
 
                 return true;
 
             case EFFECT:
-                // Retiramos a carta da mão do jogador e consumimos a mana
+                // retiramos a carta da mão do jogador e consumimos a mana
                 cardManager.useCard(card);
                 currentPlayer.consumeMana(card.getManaCost());
 
-                // Aplicamos o efeito utilizando o handler de efeitos
-                effectHandler.handleEffect(currentPlayer, currentPlayerIndex, card);
+                // aplicamos o efeito utilizando o handler de efeitos
+                effectHandler.handleEffect(currentPlayer, card);
 
                 return true;
 
@@ -250,8 +249,9 @@ public class Battle {
     }
 
     public void consumeFieldCards() {
-        fieldCards[0] = null;
-        fieldCards[1] = null;
+        for (PlayerEntity player : players) {
+            player.clearFieldCard();
+        }
     }
 
     public void handleBattlePhase() {
@@ -259,15 +259,11 @@ public class Battle {
         PlayerEntity firstPlayer = players.get(0);
         PlayerEntity secondPlayer = players.get(1);
 
-        // Pegamos as referencias das cartas de campo
-        Card firstPlayerCard = fieldCards[0];
-        Card secondPlayerCard = fieldCards[1];
+        // Fase de combate para determinar o vencedor da rodada
+        combatPhaseHandler.handleCombatPhase(firstPlayer, secondPlayer);
 
         // Consumimos as cartas em campo
         consumeFieldCards();
-
-        // Fase de combate para determinar o vencedor da rodada
-        combatPhaseHandler.handleCombatPhase(firstPlayer, secondPlayer, firstPlayerCard, secondPlayerCard);
     }
 
     private List<PlayerEntity> getPlayerEntities() {

@@ -13,18 +13,20 @@ public class CombatPhaseHandler {
         this.effectHandler = effectHandler;
     }
 
-    public void handleCombatPhase(PlayerEntity firstPlayer, PlayerEntity secondPlayer, Card firstPlayerCard, Card secondPlayerCard) {
+    public void handleCombatPhase(PlayerEntity firstPlayer, PlayerEntity secondPlayer) {
+        Card firstPlayerCard = firstPlayer.getFieldCard();
+        Card secondPlayerCard = secondPlayer.getFieldCard();
+
         // Se ambos os jogadores utilizaram cartas
         if (bothPlayersPlacedCards(firstPlayerCard, secondPlayerCard)) {
-            int firstPlayerRawPower = firstPlayerCard.getPower();
-            int secondPlayerRawPower = secondPlayerCard.getPower();
 
-            // Aplicamos os BUFFs/DEBUFFs
-            int firstPlayerTotalPower = firstPlayerRawPower + effectHandler.getEffectValuesForPlayer(0);
-            int secondPlayerTotalPower = secondPlayerRawPower + effectHandler.getEffectValuesForPlayer(1);
+            // aplicamos os BUFFs/DEBUFFs
+            int firstPlayerTotalPower = firstPlayerCard.getTotalPower();
+            int secondPlayerTotalPower = secondPlayerCard.getTotalPower();
 
-            // Limpamos as listas de efeitos
-            effectHandler.clearEffects();
+            // limpamos as listas os buff's temporários
+            firstPlayerCard.clearTempPower();
+            secondPlayerCard.clearTempPower();
 
             if (firstPlayerTotalPower == secondPlayerTotalPower) { // EMPATE
                 battleMessageHandler.sendMessage("Empate!");

@@ -1,5 +1,7 @@
 package utils;
 
+import game.cards.CardElement;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,5 +45,14 @@ public class Utils {
 
         // Converte a lista em um array
         return parts.toArray(new String[0]);
+    }
+
+    public static Color getFontColorPerElement(CardElement cardElement) {
+        return switch (cardElement) {
+            case FIRE -> Color.RED;
+            case WATER -> Color.BLUE;
+            case GRASS -> new Color(0,180,0);
+            default -> null;
+        };
     }
 }

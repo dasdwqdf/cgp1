@@ -13,6 +13,7 @@ public abstract class PlayerEntity {
     int hp;
     int mana;
     CardManager cardManager;
+    Card fieldCard;
     BufferedImage sprite;
 
     public PlayerEntity(String name, int hp, int mana, String deckName) {
@@ -59,6 +60,18 @@ public abstract class PlayerEntity {
         return hp;
     }
 
+    public void setFieldCard(Card fieldCard) {
+        this.fieldCard = fieldCard;
+    }
+
+    public Card getFieldCard() {
+        return fieldCard;
+    }
+
+    public void clearFieldCard() {
+        fieldCard = null;
+    }
+
     public CardManager getCardManager() {
         return cardManager;
     }
@@ -72,8 +85,6 @@ public abstract class PlayerEntity {
         return "Player{" +
                 "mana=" + mana + '\'' +
                 ", name='" + name + '\'' +
-                ", hp=" + hp +
-                "name='" + name + '\'' +
                 ", hp=" + hp +
                 '}';
     }

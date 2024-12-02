@@ -1,8 +1,10 @@
 package ui.components;
 
+import game.cards.Card;
 import game.controller.GamePanel;
 import game.entity.PlayerEntity;
 import utils.StatusSprites;
+import utils.Utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -71,7 +73,7 @@ public class PlayerMenu extends Menu {
         g2d.drawString(hpText, tempX + gamePanel.tileSize/2 + 4, tempY);
 
         // Sprite Mana
-        tempX += (int) (menuWidth/4);
+        tempX += (int) (menuWidth/5);
         BufferedImage filledManaSprite = statusSprites.getFilledMana();
         BufferedImage emptyManaSprite = statusSprites.getEmptyMana();
 
@@ -88,8 +90,45 @@ public class PlayerMenu extends Menu {
 
     }
 
+    public void drawFieldCard(Graphics2D g2d) {
+        // carta em campo do jogador
+        Card fieldCard = player.getFieldCard();
+
+        // caso nao tenha carta em campo
+        if (fieldCard == null) {
+            return;
+        }
+
+        int tempX = menuX + gamePanel.tileSize/2;
+        int tempY = menuY + 3*(gamePanel.tileSize/2);
+
+        Color borderColor = Color.BLACK;
+        Color elementColor = Utils.getFontColorPerElement(fieldCard.getCardElement());
+
+        // retângulo da carta
+        Rectangle cardRectangle = new Rectangle(tempX, tempY, gamePanel.tileSize, gamePanel.tileSize + 8);
+        Rectangle borderRectangle = new Rectangle(tempX, tempY, gamePanel.tileSize, gamePanel.tileSize + 8);
+
+        // fundo preto da carta
+        g2d.setColor(elementColor);
+        g2d.fill(cardRectangle);
+
+        // borda da carta
+        g2d.setColor(borderColor);
+        g2d.draw(borderRectangle);
+
+        // elemento da carta
+        g2d.drawImage(fieldCard.getCardElementSprite(), tempX + 12, tempY + 16, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
+
+        // poder da carta
+        g2d.setFont(menuFont);
+        g2d.setColor(elementColor);
+        g2d.drawString(String.valueOf(fieldCard.getTotalPower()), tempX + cardRectangle.width + 8, tempY + cardRectangle.height/2 + 8);
+    }
+
     public void drawPlayer(Graphics2D g2d) {
         drawPlayerName(g2d);
         drawPlayerStatus(g2d);
+        drawFieldCard(g2d);
     }
 }

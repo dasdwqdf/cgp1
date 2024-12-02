@@ -14,6 +14,7 @@ public class Card {
     // Carta de Poder
     CardElement cardElement;
     Integer power;
+    Integer tempPower = 0;
     Integer directDamage;
 
     // Carta de Efeito
@@ -79,6 +80,22 @@ public class Card {
         }
 
         return image;
+    }
+
+    public Integer getTotalPower() {
+        return power + tempPower;
+    }
+
+    public void setTempPower(Integer tempPower) {
+        this.tempPower = tempPower;
+    }
+
+    public Integer getTempPower() {
+        return tempPower;
+    }
+
+    public void clearTempPower() {
+        this.tempPower = 0;
     }
 
     public String getName() {
