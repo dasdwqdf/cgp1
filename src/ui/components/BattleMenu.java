@@ -1,6 +1,7 @@
 package ui.components;
 
 import game.battle.Battle;
+import game.battle.BattleMessageHandler;
 import game.cards.Card;
 import game.cards.CardManager;
 import game.controller.GamePanel;
@@ -75,7 +76,9 @@ public class BattleMenu extends Menu {
 
             case MESSAGE:
                 drawMessage(g2d);
-                drawMessageCursor(g2d);
+                if (battle.getBattleMessageHandler().canProceed)  {
+                    drawMessageCursor(g2d);
+                }
                 break;
         }
     }
@@ -193,12 +196,19 @@ public class BattleMenu extends Menu {
     }
 
     public void drawMessage(Graphics2D g2d) {
+        BattleMessageHandler battleMessageHandler = battle.getBattleMessageHandler();
+        battleMessageHandler.updateMessage();
+
         // Fonte e Cor dos textos
         g2d.setColor(Color.black);
         g2d.setFont(menuFont);
 
-        String message = battle.getBattleMessageHandler().getMessage();
-        String[] lines = Utils.breakString(message, 36);
+        String message = battleMessageHandler.getMessage();
+        if (message == null) return;
+
+        // Limita o número de caracteres já exibidos
+        String visibleMessage = message.substring(0, Math.min(battleMessageHandler.currentCharIndex, message.length()));
+        String[] lines = Utils.breakString(visibleMessage, 36);
 
         int x = menuX + gamePanel.tileSize/2;
         int baseY = menuY + gamePanel.tileSize;

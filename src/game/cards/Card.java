@@ -86,8 +86,8 @@ public class Card {
         return power + tempPower;
     }
 
-    public void setTempPower(Integer tempPower) {
-        this.tempPower = tempPower;
+    public void addTempPower(Integer tempPower) {
+        this.tempPower += tempPower;
     }
 
     public Integer getTempPower() {

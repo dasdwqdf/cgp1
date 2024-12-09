@@ -3,9 +3,6 @@ package game.battle;
 import game.cards.Card;
 import game.entity.PlayerEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class EffectHandler {
 
     BattleMessageHandler battleMessageHandler;
@@ -31,7 +28,7 @@ public class EffectHandler {
         }
 
         // Adicionamos o buff na lista
-        playerFieldCard.setTempPower(card.getEffectArg());
+        playerFieldCard.addTempPower(card.getEffectArg());
 
         String[] messages = {
             player.getName() + " utilizou " + card.getName() + ".",

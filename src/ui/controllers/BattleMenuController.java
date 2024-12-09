@@ -152,13 +152,14 @@ public class BattleMenuController {
             currentMode = BattleMenuMode.SELECT_OPTION;
         }
 
-        if (keyHandler.xPressed) {
+        if (keyHandler.xPressed && battleMessageHandler.canProceed) {
             if (battleMessageHandler.size() == 1) {
                 handleGameOver();
                 handleDiscard();
             }
 
             battleMessageHandler.consumeMessage();
+            battleMessageHandler.resetMessageAnimation();
             keyHandler.xPressed = false;
         }
     }
