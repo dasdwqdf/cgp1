@@ -5,15 +5,27 @@ import game.battle.BattleMessageHandler;
 import game.battle.BattleState;
 import game.cards.Card;
 import game.input.KeyHandler;
+import game.message.BattleMessage;
+import game.message.BattleMessageType;
+import game.message.NewBattleMessageHandler;
+import game.view.PlayerView;
+import ui.AnimationHandler;
+import ui.components.PlayerMenu;
 
+import java.awt.*;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BattleMenuController {
 
     public boolean gameOver = false;
 
-    Battle battle;
+    AnimationHandler animationHandler;
     KeyHandler keyHandler;
+
+    Battle battle;
+    PlayerView playerView, opponentView;
 
     public enum BattleMenuMode {
         SELECT_OPTION,
@@ -34,13 +46,20 @@ public class BattleMenuController {
     List<Card> playerHand;
     Integer handSize;
     BattleMessageHandler battleMessageHandler;
+    NewBattleMessageHandler newBattleMessageHandler;
 
-    public BattleMenuController(KeyHandler keyHandler, Battle battle) {
+    public BattleMenuController(AnimationHandler animationHandler, KeyHandler keyHandler, Battle battle, PlayerView playerView, PlayerView opponentView) {
+        this.animationHandler = animationHandler;
         this.keyHandler = keyHandler;
         this.battle = battle;
+        this.battleMessageHandler = battle.getBattleMessageHandler();
+        this.newBattleMessageHandler = battle.getNewBattleMessageHandler();
+        this.playerView = playerView;
+        this.opponentView = opponentView;
         this.currentMode = BattleMenuMode.MESSAGE;
         this.currentOption = BattleMenuOption.MAO;
         this.currentSelectedCardIndex = 0;
+        this.playerHand = battle.getPlayers().get(0).getCardManager().getHand();
     }
 
     public void update() {
@@ -101,16 +120,14 @@ public class BattleMenuController {
             battle.discardCard(currentCard);
             handSize = playerHand.size();
             currentSelectedCardIndex = 0;
+            currentMode = BattleMenuMode.MESSAGE;
 
             keyHandler.xPressed = false;
         }
     }
 
-    public void setCurrentMode(BattleMenuMode mode) {
-        this.currentMode = mode;
-    }
-
     private void handleSelectOption() {
+
         if (keyHandler.rightPressed) {
             currentOption = switch (currentOption) {
                 case MAO -> BattleMenuOption.CHECAR;
@@ -131,15 +148,20 @@ public class BattleMenuController {
 
         } else if (keyHandler.xPressed) {
             if (currentOption.equals(BattleMenuOption.MAO)) {
+                // Atualizamos a variável de controle do tamanho da mão
+                this.handSize = Math.min(playerHand.size(), 6);
+
                 if (handSize != 0) {
                     currentMode = BattleMenuMode.SELECT_CARD;
+
                 } else {
-                    battleMessageHandler.sendMessage("Sua mão está vazia no momento.");
+                    newBattleMessageHandler.addMessage(new BattleMessage("Sua mão está vazia no momento!", BattleMessageType.SIMPLE));
                     currentMode = BattleMenuMode.MESSAGE;
                 }
 
             } else if (currentOption.equals(BattleMenuOption.ENCERRAR)) {
                 battle.endPlayerTurn();
+                currentOption = BattleMenuOption.MAO;
                 currentMode = BattleMenuMode.MESSAGE;
             }
 
@@ -148,19 +170,136 @@ public class BattleMenuController {
     }
 
     private void handleMessage() {
-        if (battleMessageHandler.isEmpty()) {
+        if (newBattleMessageHandler.isBattleMessageListEmpty()) {
             currentMode = BattleMenuMode.SELECT_OPTION;
         }
 
-        if (keyHandler.xPressed && battleMessageHandler.canProceed) {
-            if (battleMessageHandler.size() == 1) {
-                handleGameOver();
-                handleDiscard();
-            }
-
-            battleMessageHandler.consumeMessage();
-            battleMessageHandler.resetMessageAnimation();
+        if (keyHandler.xPressed) {
+            BattleMessage battleMessage = newBattleMessageHandler.consumeMessage();
+            handleMessageType(battleMessage);
             keyHandler.xPressed = false;
+        }
+    }
+
+    private void handleMessageType(BattleMessage battleMessage) {
+        // Resgatamos o tipo da mensagem de batalha
+        BattleMessageType battleMessageType = battleMessage.getType();
+
+        // O alvo da aplicação do efeito
+        int target = battleMessage.getTarget();
+
+        System.out.println(battleMessage);
+
+        switch (battleMessageType) {
+            case SIMPLE:
+                break;
+
+            case DAMAGE:
+                // Animação de Dano
+                animationHandler.enableDamageAnimation(target);
+
+                if (target == 1) {
+                    // Animação de Dano
+                    playerView.updateHp();
+
+                } else {
+                    opponentView.updateHp();
+                }
+
+                break;
+
+            case REGEN_MANA:
+                // Animação de Mana
+                animationHandler.enableManaAnimation(target);
+
+                if (target == 1) {
+                    playerView.updateMana();
+
+                } else {
+                    opponentView.updateMana();
+                }
+
+                break;
+
+            case DRAW_CARD:
+                break;
+
+            case DISCARD_CARD:
+                handleDiscard();
+                break;
+
+            case FIELD_CARD:
+                if (target == 1) {
+                    playerView.updateMana();
+                    playerView.updateFieldCard();
+
+                } else {
+                    opponentView.updateMana();
+                    opponentView.updateFieldCard();
+                }
+
+                break;
+
+            case EFFECT_CARD:
+                if (target == 1) {
+                    // mais código depois aqui
+                    playerView.updateMana();
+
+                } else {
+                    opponentView.updateMana();
+                }
+
+                break;
+
+            case HEAL_EFFECT:
+                // Animação de Heal
+                animationHandler.enableHealAnimation(target);
+
+                if (target == 1) {
+                    // mais código
+                    playerView.updateHp();
+
+                } else {
+                    opponentView.updateHp();
+                }
+
+                break;
+
+            case POWER_UP_EFFECT:
+                if (target == 1) {
+                    playerView.updateFieldCard();
+
+                } else {
+                    opponentView.updateFieldCard();
+                }
+
+                break;
+
+            case DRAW_EFFECT:
+                handleDiscard();
+                break;
+
+            case REDRAW_EFFECT:
+                break;
+
+            case BATTLE_PHASE_START:
+                break;
+
+            case BATTLE_DRAW:
+                break;
+
+            case BATTLE_WIN:
+                break;
+
+            case BATTLE_PHASE_END:
+                battle.consumeFieldCards();
+                playerView.updateFieldCard();
+                opponentView.updateFieldCard();
+                break;
+
+            case GAME_FINISHED:
+                handleGameOver();
+                break;
         }
     }
 
@@ -198,13 +337,5 @@ public class BattleMenuController {
 
     public List<Card> getPlayerHand() {
         return playerHand;
-    }
-
-    public void setPlayerHand(List<Card> playerHand) {
-        this.playerHand = playerHand;
-    }
-
-    public void setBattleMessageHandler(BattleMessageHandler battleMessageHandler) {
-        this.battleMessageHandler = battleMessageHandler;
     }
 }

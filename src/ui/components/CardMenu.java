@@ -4,7 +4,7 @@ import game.cards.Card;
 import game.cards.CardType;
 import game.controller.GamePanel;
 import ui.controllers.BattleMenuController;
-import utils.StatusSprites;
+import utils.SpritesHandler;
 import utils.Utils;
 
 import java.awt.*;
@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 
 public class CardMenu extends Menu {
 
-    StatusSprites statusSprites;
+    SpritesHandler spritesHandler;
     BattleMenuController battleMenuController;
     Font cardDescriptionFont = menuFont.deriveFont(24f);
 
@@ -20,7 +20,7 @@ public class CardMenu extends Menu {
         super(gamePanel);
         initCardMenuDefaultValues();
         this.battleMenuController = battleMenuController;
-        this.statusSprites = gamePanel.statusSprites;
+        this.spritesHandler = gamePanel.spritesHandler;
     }
 
     private void initCardMenuDefaultValues() {
@@ -65,7 +65,7 @@ public class CardMenu extends Menu {
 
             // Dano Direto
             tempX += (int) (menuWidth/3.5);
-            BufferedImage directDamageSprite = statusSprites.getDirectDamage();
+            BufferedImage directDamageSprite = spritesHandler.getDirectDamage();
             g2d.drawImage(directDamageSprite, tempX, tempY - gamePanel.tileSize/2, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
 
             Color directDamageColor = new Color(225, 80, 20);
@@ -78,7 +78,7 @@ public class CardMenu extends Menu {
         }
 
         // Custo de Mana
-        BufferedImage cardManaCostSprite = statusSprites.getFilledMana();
+        BufferedImage cardManaCostSprite = spritesHandler.getFilledMana();
         g2d.drawImage(cardManaCostSprite, tempX, tempY - gamePanel.tileSize/2, gamePanel.tileSize/2, gamePanel.tileSize/2, null);
 
         Color manaCostColor = new Color(0, 173, 201);

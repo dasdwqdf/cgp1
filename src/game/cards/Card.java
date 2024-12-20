@@ -142,6 +142,18 @@ public class Card {
         return cardElementSprite;
     }
 
+public Card duplicate() {
+    if (cardType.equals(CardType.POWER)) {
+        Card newCard = new Card(name, manaCost, cardElement, power, directDamage, description);
+        newCard.tempPower = this.tempPower; // Duplica atributo adicional
+        return newCard;
+    } else if (cardType.equals(CardType.EFFECT)) {
+        Card newCard = new Card(name, manaCost, cardEffect, effectArg, description);
+        return newCard;
+    }
+    return null; // Caso de segurança, embora este cenário não deva ocorrer
+}
+
     @Override
     public String toString() {
         return "Card{" +

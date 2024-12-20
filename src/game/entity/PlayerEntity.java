@@ -37,7 +37,7 @@ public abstract class PlayerEntity {
     }
 
     public void receiveDamage(int value) {
-        hp -= value;
+        hp = Math.max(0, hp - value);
     }
 
     public abstract Card selectBestCard();
@@ -46,10 +46,6 @@ public abstract class PlayerEntity {
 
     public int getMana() {
         return mana;
-    }
-
-    public void setMana(int mana) {
-        this.mana = mana;
     }
 
     public String getName() {

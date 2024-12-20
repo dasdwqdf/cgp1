@@ -1,77 +1,72 @@
 package game.battle;
 
 import game.cards.Card;
+import game.entity.AiEntity;
 import game.entity.PlayerEntity;
+import game.message.BattleMessage;
+import game.message.BattleMessageType;
+import game.message.NewBattleMessageHandler;
 
 public class EffectHandler {
 
-    BattleMessageHandler battleMessageHandler;
+    NewBattleMessageHandler battleMessageHandler;
 
-    public EffectHandler(BattleMessageHandler battleMessageHandler) {
+    public EffectHandler(NewBattleMessageHandler battleMessageHandler) {
         this.battleMessageHandler = battleMessageHandler;
     }
 
     public void handleEffect(PlayerEntity player, Card card) {
+        // Mensagem de utilização da Carta de Efeito
+        String cardMessage = player.getName() + " utilizou " + card.getName() + ".";
+        int target = !(player instanceof AiEntity) ? 1 : 2;
+        battleMessageHandler.addMessage(new BattleMessage(cardMessage, BattleMessageType.EFFECT_CARD, target));
+
         switch (card.getCardEffect()) {
-            case DRAW -> handleDrawEffect(player, card);
-            case REDRAW -> handleRedrawEffect(player, card);
-            case HEAL -> handleHealEffect(player, card);
-            case BUFF -> handleBuffEffect(player, card, player.getFieldCard());
+            case DRAW -> handleDrawEffect(player, card, target);
+            case REDRAW -> handleRedrawEffect(player, card, target);
+            case HEAL -> handleHealEffect(player, card, target);
+            case BUFF -> handleBuffEffect(player, card, player.getFieldCard(), target);
         };
     }
 
-    private void handleBuffEffect(PlayerEntity player, Card card, Card playerFieldCard) {
+    private void handleBuffEffect(PlayerEntity player, Card card, Card playerFieldCard, int target) {
 
         if (playerFieldCard == null) {
-            battleMessageHandler.sendMessage("Você não possui cartas em campo para aplicar o buff.");
+            String message = "Você não possui cartas em campo para aplicar o buff.";
+            battleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE));
+
             return;
         }
 
-        // Adicionamos o buff na lista
+        // Aplicamos o aprimoramento temporário na carta
         playerFieldCard.addTempPower(card.getEffectArg());
 
-        String[] messages = {
-            player.getName() + " utilizou " + card.getName() + ".",
-            "O poder do campo de " + player.getName() + " foi aumentado em " + card.getEffectArg() + "."
-        };
-
-        battleMessageHandler.sendMessage(messages);
+        String powerUpMessage = "O poder do campo de " + player.getName() + " foi aumentado em " + card.getEffectArg() + ".";
+        battleMessageHandler.addMessage(new BattleMessage(powerUpMessage, BattleMessageType.POWER_UP_EFFECT, target));
     }
 
-    private void handleHealEffect(PlayerEntity player, Card card) {
+    private void handleHealEffect(PlayerEntity player, Card card, int target) {
         int value = card.getEffectArg();
         player.heal(value);
 
-        String[] messages = {
-                player.getName() + " recuperou " + value + " ponto(s) de vida.",
-        };
-
-        battleMessageHandler.sendMessage(messages);
+        String healMessage = player.getName() + " recuperou " + value + " ponto(s) de vida.";
+        battleMessageHandler.addMessage(new BattleMessage(healMessage, BattleMessageType.HEAL_EFFECT, target));
     }
 
-    private void handleRedrawEffect(PlayerEntity player, Card card) {
+    private void handleRedrawEffect(PlayerEntity player, Card card, int target) {
         int numCards = card.getEffectArg();
         int numDiscardedCards = player.getCardManager().discardCards(numCards);
         int drawnCards = player.getCardManager().drawCards(numCards);
 
-        String[] messages = {
-                player.getName() + " utilizou " + card.getName(),
-                numDiscardedCards + " carta(s) foram descartadas.",
-                drawnCards + " carta(s) foram compradas."
-        };
-
-        battleMessageHandler.sendMessage(messages);
+        String redrawMessage = numDiscardedCards + " carta(s) foram descartadas e " + drawnCards + " carta(s) foram compradas.";
+        battleMessageHandler.addMessage(new BattleMessage(redrawMessage, BattleMessageType.REDRAW_EFFECT, target));
     }
 
-    private void handleDrawEffect(PlayerEntity player, Card card) {
+    private void handleDrawEffect(PlayerEntity player, Card card, int target) {
         int numCards = card.getEffectArg();
         int drawnCards = player.getCardManager().drawCards(numCards);
 
-        String[] messages = {
-                player.getName() + " utilizou " + card.getName(),
-                drawnCards + " carta(s) foram compradas."
-        };
-
-        battleMessageHandler.sendMessage(messages);
+        String drawMessage = player.getName() + " comprou " + drawnCards + " carta(s).";
+        battleMessageHandler.addMessage(new BattleMessage(drawMessage, BattleMessageType.DRAW_EFFECT, target));
     }
 }

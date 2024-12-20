@@ -1,12 +1,14 @@
 package ui.components;
 
 import game.battle.Battle;
-import game.battle.BattleMessageHandler;
 import game.cards.Card;
 import game.cards.CardManager;
 import game.controller.GamePanel;
 import game.entity.PlayerEntity;
+import game.message.NewBattleMessageHandler;
 import game.states.GameState;
+import game.view.PlayerView;
+import ui.AnimationHandler;
 import ui.controllers.BattleMenuController;
 import utils.Utils;
 
@@ -16,29 +18,48 @@ import java.util.List;
 
 public class BattleMenu extends Menu {
 
+    Color backgroundColor = new Color(0, 0, 0);
+
+    // Batalha
     Battle battle;
-    PlayerMenu playerMenu;
-    PlayerMenu opponentMenu;
+
+    // UI's
+    PlayerMenu playerUI, opponentUI;
     CardMenu cardMenu;
+
+    // Controllers
     BattleMenuController battleMenuController;
+
+    // Animações
+    AnimationHandler animationHandler;
     Integer animationCounter = 0;
 
     public BattleMenu(GamePanel gamePanel, Battle battle) {
         super(gamePanel);
+        this.animationHandler = new AnimationHandler(gamePanel);
+        animationHandler.transitionAnimation = true;
         this.battle = battle;
-        this.battleMenuController = new BattleMenuController(gamePanel.keyHandler, battle);
-        this.cardMenu = new CardMenu(gamePanel, battleMenuController);
-        battle.setBattleMenuController(battleMenuController);
+        initMenus();
         battle.startBattle();
         initBattleMenuDefaultValues();
-        initPlayersMenus();
     }
 
-    private void initPlayersMenus() {
+    private void initMenus() {
+        // Jogador #1
         PlayerEntity player = battle.getPlayers().get(0);
-        playerMenu = new PlayerMenu(gamePanel, PlayerMenuType.PLAYER, player);
+        PlayerView playerView = new PlayerView(player);
+        this.playerUI = new PlayerMenu(gamePanel, PlayerMenuType.PLAYER, playerView);
+
+        // Jogador #2
         PlayerEntity opponent = battle.getPlayers().get(1);
-        opponentMenu = new PlayerMenu(gamePanel, PlayerMenuType.OPPONENT, opponent);
+        PlayerView opponentView = new PlayerView(opponent);
+        this.opponentUI = new PlayerMenu(gamePanel, PlayerMenuType.OPPONENT, opponentView);
+
+        // Controller do Menu de Batalha
+        this.battleMenuController = new BattleMenuController(animationHandler, gamePanel.keyHandler, battle, playerView, opponentView);
+
+        // UI descrição de cartas
+        this.cardMenu = new CardMenu(gamePanel, battleMenuController);
     }
 
     private void initBattleMenuDefaultValues() {
@@ -58,9 +79,20 @@ public class BattleMenu extends Menu {
 
     @Override
     public void draw(Graphics2D g2d) {
+        if (animationHandler.transitionAnimation) {
+            animationHandler.draw(g2d);
+            return;
+        }
+
+        // Desenha o plano de fundo
+        drawBackground(g2d);
+
+        // Desenha a caixa de opções
         drawMenuWindow(g2d);
-        playerMenu.draw(g2d);
-        opponentMenu.draw(g2d);
+
+        // UI's do jogador e oponente
+        playerUI.draw(g2d);
+        opponentUI.draw(g2d);
 
         switch (battleMenuController.getCurrentMode()) {
             case SELECT_OPTION :
@@ -76,11 +108,18 @@ public class BattleMenu extends Menu {
 
             case MESSAGE:
                 drawMessage(g2d);
-                if (battle.getBattleMessageHandler().canProceed)  {
-                    drawMessageCursor(g2d);
-                }
+                drawMessageCursor(g2d);
                 break;
         }
+
+        animationHandler.draw(g2d);
+    }
+
+    public void drawBackground(Graphics2D g2d) {
+        int width = gamePanel.screenWidth;
+        int height = gamePanel.screenHeight;
+        g2d.setColor(backgroundColor);
+        g2d.fillRect(0, 0, width, height);
     }
 
     public void drawBattleMenuOptions(Graphics2D g2d) {
@@ -196,19 +235,16 @@ public class BattleMenu extends Menu {
     }
 
     public void drawMessage(Graphics2D g2d) {
-        BattleMessageHandler battleMessageHandler = battle.getBattleMessageHandler();
-        battleMessageHandler.updateMessage();
+        NewBattleMessageHandler battleMessageHandler = battle.getNewBattleMessageHandler();
 
         // Fonte e Cor dos textos
         g2d.setColor(Color.black);
         g2d.setFont(menuFont);
 
-        String message = battleMessageHandler.getMessage();
+        String message = battleMessageHandler.getBattleMessage();
         if (message == null) return;
 
-        // Limita o número de caracteres já exibidos
-        String visibleMessage = message.substring(0, Math.min(battleMessageHandler.currentCharIndex, message.length()));
-        String[] lines = Utils.breakString(visibleMessage, 36);
+        String[] lines = Utils.breakString(message, 36);
 
         int x = menuX + gamePanel.tileSize/2;
         int baseY = menuY + gamePanel.tileSize;

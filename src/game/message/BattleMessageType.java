@@ -1,0 +1,20 @@
+package game.message;
+
+public enum BattleMessageType {
+    SIMPLE,
+    DAMAGE,
+    REGEN_MANA,
+    DRAW_CARD,
+    DISCARD_CARD,
+    FIELD_CARD,
+    EFFECT_CARD,
+    HEAL_EFFECT,
+    POWER_UP_EFFECT,
+    DRAW_EFFECT,
+    REDRAW_EFFECT,
+    BATTLE_PHASE_START,
+    BATTLE_DRAW,
+    BATTLE_WIN,
+    BATTLE_PHASE_END,
+    GAME_FINISHED
+}
