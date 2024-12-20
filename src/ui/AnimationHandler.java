@@ -93,7 +93,7 @@ public class AnimationHandler {
     public void drawPowerUpAnimation(Graphics2D g2d, int x, int y) {
 
         // Caso os dois estejam ativos o contador iria incrementar 2
-        // portando verificamos antes e incrementamos de acordo com os powerups's ativos
+        // portando verificamos antes e incrementamos conforme os aprimoramentos ativos
         powerUpAnimationCounter = (playerPowerUpAnimation && botPowerUpAnimation ?
                 powerUpAnimationCounter + 1 : powerUpAnimationCounter + 2);
 
