@@ -1,11 +1,13 @@
 package utils;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class SpritesHandler {
 
+    public BufferedImage deck;
     public BufferedImage filledMana;
     public BufferedImage emptyMana;
     public BufferedImage directDamage;
@@ -44,6 +46,10 @@ public class SpritesHandler {
         loadSprites();
     }
 
+    public BufferedImage getDeck() {
+        return deck;
+    }
+
     public BufferedImage getFilledMana() {
         return filledMana;
     }
@@ -62,6 +68,10 @@ public class SpritesHandler {
 
     public BufferedImage getPowerUp() {
         return powerUp;
+    }
+
+    public BufferedImage getElementalPowerUp() {
+        return elementalPowerUp;
     }
 
     public BufferedImage getElementalPowerDown() {
@@ -174,11 +184,13 @@ public class SpritesHandler {
 
     private void loadSprites() {
         try {
+            deck = ImageIO.read(getClass().getResource("/decks/deck.png"));
             filledMana = ImageIO.read(getClass().getResource("/status/filled-mana.png"));
             emptyMana = ImageIO.read(getClass().getResource("/status/empty-mana.png"));
             directDamage = ImageIO.read(getClass().getResource("/status/direct-damage.png"));
             heart = ImageIO.read(getClass().getResource("/status/heart.png"));
             powerUp = ImageIO.read(getClass().getResource("/status/power-up.png"));
+            elementalPowerUp = ImageIO.read(getClass().getResource("/status/elemental-power-up.png"));
             elementalPowerDown = ImageIO.read(getClass().getResource("/status/elemental-power-down.png"));
             playerIdle0 = ImageIO.read(getClass().getResource("/characters/player-idle-0.png"));
             playerIdle1 = ImageIO.read(getClass().getResource("/characters/player-idle-1.png"));

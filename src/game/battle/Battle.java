@@ -61,7 +61,7 @@ public class Battle {
 
         // Mensagem de Início de Batalha
         String message = "Batalha iniciada entre " + firstPlayer.getName() + " e " + secondPlayer.getName() + ".";
-        newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE));
+        newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.DRAW_CARD));
 //        battleMessageHandler.sendMessage(message);
 
         // Inicia o Turno do Jogador
@@ -85,7 +85,7 @@ public class Battle {
         if (drawnCards > 0) {
             // Mensagem de compra de cartas
             String message = currentPlayer.getName() + " comprou " + drawnCards + " cartas(s) do baralho.";
-            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE));
+            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.DRAW_CARD));
         }
 
         // Lidamos com o descarte de cartas extras

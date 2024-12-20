@@ -27,11 +27,14 @@ public class AnimationHandler {
     int healAnimationCounter = 0;
     int manaAnimationCounter = 0;
     int powerUpAnimationCounter = 0;
+    int elementalPowerUpOrDownAnimation = 0;
     boolean damageAnimation = false;
     boolean healAnimation = false;
     boolean manaAnimation = false;
     boolean playerPowerUpAnimation = false;
     boolean botPowerUpAnimation = false;
+    boolean elementalPowerUpAnimation = false;
+    boolean elementalPowerDownAnimation = false;
 
     int totalSprites = 5;
     int animationSpeed = 20;
@@ -60,6 +63,17 @@ public class AnimationHandler {
         if (botPowerUpAnimation) {
             drawBotPowerUpAnimation(g2d);
         }
+        if (elementalPowerUpAnimation || elementalPowerDownAnimation) {
+            drawElementalPowerUpOrDownAnimation(g2d);
+        }
+    }
+
+    public void enableElementalPowerUpAnimation() {
+        elementalPowerUpAnimation = true;
+    }
+
+    public void enableElementalPowerDownAnimation() {
+        elementalPowerDownAnimation = true;
     }
 
     public void enablePlayerPowerUpAnimation() {
@@ -88,6 +102,56 @@ public class AnimationHandler {
     public void enableManaAnimation(int target) {
         this.target = target;
         manaAnimation = true;
+    }
+
+    public void drawElementalPowerUpOrDownAnimation(Graphics2D g2d) {
+        elementalPowerUpOrDownAnimation++;
+
+        // Calcula as coordenadas
+        int x = playerMenuX + 4 * gamePanel.tileSize - 8;
+        int y = playerMenuY + 2 * gamePanel.tileSize - 10;
+
+        // Recupera o sprite do power-up
+        BufferedImage elementalPowerUpSprite = elementalPowerUpAnimation ? spritesHandler.getElementalPowerUp() : spritesHandler.getElementalPowerDown();
+
+        // Define a duração total da animação em frames
+        int animationDuration = 120;
+        float alpha = opacityProgress(animationDuration);
+
+        if (alpha > 0) {
+            // Configura a opacidade
+            AlphaComposite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+            g2d.setComposite(composite);
+
+            // Desenha o sprite com a opacidade calculada
+            g2d.drawImage(elementalPowerUpSprite, x, y, gamePanel.tileSize / 2, gamePanel.tileSize / 2, null);
+
+            // Restaura a opacidade padrão
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        }
+
+
+        // Reinicia o contador após a animação
+        if (elementalPowerUpOrDownAnimation >= animationDuration) {
+            elementalPowerUpOrDownAnimation = 0; // Ou marque como concluído, se necessário
+            elementalPowerUpAnimation = false;
+            elementalPowerDownAnimation = false;
+        }
+    }
+
+    private float opacityProgress(int animationDuration) {
+        int halfDuration = animationDuration / 2;
+
+        // Calcula a opacidade com base no progresso da animação
+        float alpha;
+        if (elementalPowerUpOrDownAnimation <= halfDuration) {
+            // Aumenta a opacidade de 0 a 1 na primeira metade
+            alpha = (float) elementalPowerUpOrDownAnimation / halfDuration;
+        } else {
+            // Diminui a opacidade de 1 a 0 na segunda metade
+            alpha = 1.0f - (float) (elementalPowerUpOrDownAnimation - halfDuration) / halfDuration;
+        }
+        return alpha;
     }
 
     public void drawPowerUpAnimation(Graphics2D g2d, int x, int y) {

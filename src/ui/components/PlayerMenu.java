@@ -121,7 +121,7 @@ public class PlayerMenu extends Menu {
         g2d.drawString(hpText, tempX + gamePanel.tileSize/2 + 4, tempY);
 
         // Sprite Mana
-        tempX += (int) (menuWidth/7);
+        tempX += (int) (menuWidth/6);
         BufferedImage filledManaSprite = spritesHandler.getFilledMana();
         BufferedImage emptyManaSprite = spritesHandler.getEmptyMana();
 
@@ -136,6 +136,15 @@ public class PlayerMenu extends Menu {
             tempX += gamePanel.tileSize/2 + 4;
         }
 
+        // Sprite Deck
+        BufferedImage deckSprite = spritesHandler.getDeck();
+        g2d.drawImage(deckSprite, tempX + marginX, tempY - (gamePanel.tileSize - 10), gamePanel.tileSize, gamePanel.tileSize, null);
+
+        tempX += gamePanel.tileSize;
+
+        // Texto NuCartas do Deck
+        String nuCardsDeck = "x" + String.valueOf(playerView.getNuCardsDeck());
+        g2d.drawString(nuCardsDeck, tempX + marginX, tempY);
     }
 
     public void drawFieldCard(Graphics2D g2d) {

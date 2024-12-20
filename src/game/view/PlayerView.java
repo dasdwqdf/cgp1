@@ -12,6 +12,7 @@ public class PlayerView {
     private final String name;
     private int hp;
     private int mana;
+    private int nuCardsDeck;
     private Card fieldCard;
 
     public PlayerView(PlayerEntity playerReference) {
@@ -19,6 +20,7 @@ public class PlayerView {
         this.name = playerReference.getName();
         this.hp = playerReference.getHp();
         this.mana = playerReference.getMana();
+        this.nuCardsDeck = playerReference.getCardManager().getDeck().size();
         this.fieldCard = playerReference.getFieldCard() != null ? playerReference.getFieldCard().duplicate() : null;
     }
 
@@ -28,6 +30,10 @@ public class PlayerView {
 
     public void updateMana() {
         this.mana = playerReference.getMana();
+    }
+
+    public void updateNuCardsDeck() {
+        this.nuCardsDeck = playerReference.getCardManager().getDeck().size();
     }
 
     public void updateFieldCard() {
@@ -45,6 +51,10 @@ public class PlayerView {
 
     public int getMana() {
         return mana;
+    }
+
+    public int getNuCardsDeck() {
+        return nuCardsDeck;
     }
 
     public Card getFieldCard() {

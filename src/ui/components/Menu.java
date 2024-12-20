@@ -10,8 +10,8 @@ public class Menu extends UI {
     Font menuFont = defaultFont.deriveFont(Font.BOLD, 32);
 
     Color shadowColor = new Color(25, 25, 25, 255);
-    Color menuColor = new Color(225, 225, 200, 255);
-    Color borderColor = new Color(250, 115, 50, 255);
+    Color menuColor = new Color(250, 205, 200, 255);
+    Color borderColor = new Color(235, 105, 90, 255);
 
     // Variáveis do Menu
     int menuWidth;
@@ -41,8 +41,6 @@ public class Menu extends UI {
             // Retangulo de shadow
             g2d.setColor(shadowColor);
             g2d.fillRoundRect(menuX +10, menuY +10, menuWidth, menuHeight, 10, 10);
-
-
         }
 
         // Retangulo principal

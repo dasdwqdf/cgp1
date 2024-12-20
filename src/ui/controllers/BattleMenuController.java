@@ -218,6 +218,8 @@ public class BattleMenuController {
                 break;
 
             case DRAW_CARD:
+                playerView.updateNuCardsDeck();
+                opponentView.updateNuCardsDeck();
                 break;
 
             case DISCARD_CARD:
@@ -275,17 +277,24 @@ public class BattleMenuController {
                 break;
 
             case DRAW_EFFECT:
-                handleDiscard();
+                if (target == 1) {
+                    playerView.updateNuCardsDeck();
+                    handleDiscard();
+                } else {
+                    opponentView.updateNuCardsDeck();
+                }
                 break;
 
             case REDRAW_EFFECT:
                 break;
 
             case ELEMENTAL_POWER_UP:
+                animationHandler.enableElementalPowerUpAnimation();
                 playerView.updateFieldCard();
                 break;
 
             case ELEMENTAL_POWER_DOWN:
+                animationHandler.enableElementalPowerDownAnimation();
                 playerView.updateFieldCard();
                 break;
 
