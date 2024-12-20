@@ -22,12 +22,16 @@ public class AnimationHandler {
 
     int target;
 
+    // Player UI's
     int damageAnimationCounter = 0;
     int healAnimationCounter = 0;
     int manaAnimationCounter = 0;
+    int powerUpAnimationCounter = 0;
     boolean damageAnimation = false;
     boolean healAnimation = false;
     boolean manaAnimation = false;
+    boolean playerPowerUpAnimation = false;
+    boolean botPowerUpAnimation = false;
 
     int totalSprites = 5;
     int animationSpeed = 20;
@@ -50,6 +54,25 @@ public class AnimationHandler {
         if (manaAnimation) {
             drawManaAnimation(g2d);
         }
+        if (playerPowerUpAnimation) {
+            drawPlayerPowerUpAnimation(g2d);
+        }
+        if (botPowerUpAnimation) {
+            drawBotPowerUpAnimation(g2d);
+        }
+    }
+
+    public void enablePlayerPowerUpAnimation() {
+        playerPowerUpAnimation = true;
+    }
+
+    public void enableBotPowerUpAnimation() {
+        botPowerUpAnimation = true;
+    }
+
+    public void disablePowerUpAnimation() {
+        playerPowerUpAnimation = false;
+        botPowerUpAnimation = false;
     }
 
     public void enableDamageAnimation(int target) {
@@ -65,6 +88,46 @@ public class AnimationHandler {
     public void enableManaAnimation(int target) {
         this.target = target;
         manaAnimation = true;
+    }
+
+    public void drawPowerUpAnimation(Graphics2D g2d, int x, int y) {
+
+        // Caso os dois estejam ativos o contador iria incrementar 2
+        // portando verificamos antes e incrementamos de acordo com os powerups's ativos
+        powerUpAnimationCounter = (playerPowerUpAnimation && botPowerUpAnimation ?
+                powerUpAnimationCounter + 1 : powerUpAnimationCounter + 2);
+
+        BufferedImage powerUpSprite = spritesHandler.getPowerUp();
+
+        // Define a duração de cada estado (visível/invisível) em frames
+        int blinkDuration = 60;
+
+        // Determina a opacidade com base no contador
+        boolean isVisible = (powerUpAnimationCounter / blinkDuration) % 2 == 0;
+
+        if (isVisible) {
+            // Desenha o sprite com opacidade total
+            g2d.drawImage(powerUpSprite, x, y, gamePanel.tileSize / 2, gamePanel.tileSize / 2, null);
+        }
+
+        // Reinicia o contador para evitar overflow
+        if (powerUpAnimationCounter >= blinkDuration * 2) {
+            powerUpAnimationCounter = 0;
+        }
+    }
+
+    public void drawPlayerPowerUpAnimation(Graphics2D g2d) {
+        int x = playerMenuX;
+        int y = playerMenuY;
+
+        drawPowerUpAnimation(g2d, x, y);
+    }
+
+    public void drawBotPowerUpAnimation(Graphics2D g2d) {
+        int x = botMenuX;
+        int y = botMenuY;
+
+        drawPowerUpAnimation(g2d, x, y);
     }
 
     public void drawDamageAnimation(Graphics2D g2d) {

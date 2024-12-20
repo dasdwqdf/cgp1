@@ -11,6 +11,8 @@ public class SpritesHandler {
     public BufferedImage emptyMana;
     public BufferedImage directDamage;
     public BufferedImage heart;
+    public BufferedImage powerUp;
+    public BufferedImage powerDown;
     public BufferedImage playerIdle0;
     public BufferedImage playerIdle1;
     public BufferedImage playerDamage;
@@ -56,6 +58,14 @@ public class SpritesHandler {
 
     public BufferedImage getHeart() {
         return heart;
+    }
+
+    public BufferedImage getPowerUp() {
+        return powerUp;
+    }
+
+    public BufferedImage getPowerDown() {
+        return powerDown;
     }
 
     public BufferedImage getPlayerIdle0() {
@@ -168,6 +178,8 @@ public class SpritesHandler {
             emptyMana = ImageIO.read(getClass().getResource("/status/empty-mana.png"));
             directDamage = ImageIO.read(getClass().getResource("/status/direct-damage.png"));
             heart = ImageIO.read(getClass().getResource("/status/heart.png"));
+            powerUp = ImageIO.read(getClass().getResource("/status/power-up.png"));
+            powerDown = ImageIO.read(getClass().getResource("/status/power-down.png"));
             playerIdle0 = ImageIO.read(getClass().getResource("/characters/player-idle-0.png"));
             playerIdle1 = ImageIO.read(getClass().getResource("/characters/player-idle-1.png"));
             playerDamage = ImageIO.read(getClass().getResource("/characters/player-damage.png"));

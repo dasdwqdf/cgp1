@@ -10,11 +10,7 @@ import game.message.BattleMessageType;
 import game.message.NewBattleMessageHandler;
 import game.view.PlayerView;
 import ui.AnimationHandler;
-import ui.components.PlayerMenu;
 
-import java.awt.*;
-import java.sql.SQLOutput;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BattleMenuController {
@@ -266,10 +262,13 @@ public class BattleMenuController {
                 break;
 
             case POWER_UP_EFFECT:
+                // Animação de Power UP
                 if (target == 1) {
+                    animationHandler.enablePlayerPowerUpAnimation();
                     playerView.updateFieldCard();
 
                 } else {
+                    animationHandler.enableBotPowerUpAnimation();
                     opponentView.updateFieldCard();
                 }
 
@@ -292,6 +291,7 @@ public class BattleMenuController {
                 break;
 
             case BATTLE_PHASE_END:
+                animationHandler.disablePowerUpAnimation();
                 battle.consumeFieldCards();
                 playerView.updateFieldCard();
                 opponentView.updateFieldCard();
