@@ -1,6 +1,8 @@
 package game.battle;
 
 import game.cards.Card;
+import game.cards.CardElement;
+import game.cards.ElementalAdvantage;
 import game.entity.PlayerEntity;
 import game.message.BattleMessage;
 import game.message.BattleMessageType;
@@ -25,13 +27,28 @@ public class CombatPhaseHandler {
         // Se ambos os jogadores utilizaram cartas
         if (bothPlayersPlacedCards(firstPlayerCard, secondPlayerCard)) {
 
+            CardElement elemento1 = firstPlayerCard.getCardElement();
+            CardElement elemento2 = secondPlayerCard.getCardElement();
+
+            // Aplicamos as vantagens/desvantagens elementais
+            int elementalAdvantage = ElementalAdvantage.getAdvantage(elemento1, elemento2);
+            firstPlayerCard.addTempPower(elementalAdvantage);
+
+            System.out.println(firstPlayerCard);
+
+            // Mensagens para caso seja aplicado alguma vantagem/desvantagem
+            if (elementalAdvantage > 0) {
+                String elementalMessage = elemento1.name() + " é efetivo contra " + elemento2.name() + ", +2 de poder para " + firstPlayerCard.getName();
+                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_UP));
+
+            } else if (elementalAdvantage < 0) {
+                String elementalMessage = elemento1.name() + " é fraco contra " + elemento2.name() + ", -2 de poder para " + firstPlayerCard.getName();
+                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_DOWN));
+            }
+
             // Aplicamos os aprimoramentos das cartas em campo
             int firstPlayerTotalPower = firstPlayerCard.getTotalPower();
             int secondPlayerTotalPower = secondPlayerCard.getTotalPower();
-
-            // Limpamos as listas de aprimoramentos temporários
-            firstPlayerCard.clearTempPower();
-            secondPlayerCard.clearTempPower();
 
             if (firstPlayerTotalPower == secondPlayerTotalPower) { // EMPATE
                 String message = "Empate!";

@@ -281,6 +281,14 @@ public class BattleMenuController {
             case REDRAW_EFFECT:
                 break;
 
+            case ELEMENTAL_POWER_UP:
+                playerView.updateFieldCard();
+                break;
+
+            case ELEMENTAL_POWER_DOWN:
+                playerView.updateFieldCard();
+                break;
+
             case BATTLE_PHASE_START:
                 break;
 

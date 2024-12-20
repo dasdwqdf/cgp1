@@ -32,6 +32,7 @@ public class PlayerView {
 
     public void updateFieldCard() {
         this.fieldCard = playerReference.getFieldCard() != null ? playerReference.getFieldCard().duplicate() : null;
+        if (fieldCard != null) System.out.println(fieldCard);
     }
 
     public String getName() {

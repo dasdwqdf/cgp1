@@ -1,7 +1,6 @@
 package utils;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -12,7 +11,8 @@ public class SpritesHandler {
     public BufferedImage directDamage;
     public BufferedImage heart;
     public BufferedImage powerUp;
-    public BufferedImage powerDown;
+    public BufferedImage elementalPowerUp;
+    public BufferedImage elementalPowerDown;
     public BufferedImage playerIdle0;
     public BufferedImage playerIdle1;
     public BufferedImage playerDamage;
@@ -64,8 +64,8 @@ public class SpritesHandler {
         return powerUp;
     }
 
-    public BufferedImage getPowerDown() {
-        return powerDown;
+    public BufferedImage getElementalPowerDown() {
+        return elementalPowerDown;
     }
 
     public BufferedImage getPlayerIdle0() {
@@ -179,7 +179,7 @@ public class SpritesHandler {
             directDamage = ImageIO.read(getClass().getResource("/status/direct-damage.png"));
             heart = ImageIO.read(getClass().getResource("/status/heart.png"));
             powerUp = ImageIO.read(getClass().getResource("/status/power-up.png"));
-            powerDown = ImageIO.read(getClass().getResource("/status/power-down.png"));
+            elementalPowerDown = ImageIO.read(getClass().getResource("/status/elemental-power-down.png"));
             playerIdle0 = ImageIO.read(getClass().getResource("/characters/player-idle-0.png"));
             playerIdle1 = ImageIO.read(getClass().getResource("/characters/player-idle-1.png"));
             playerDamage = ImageIO.read(getClass().getResource("/characters/player-damage.png"));

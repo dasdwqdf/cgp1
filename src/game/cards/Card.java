@@ -164,6 +164,7 @@ public Card duplicate() {
                 ", power=" + power +
                 ", cardEffect=" + cardEffect +
                 ", effectArg=" + effectArg +
+                ", tempPower=" + tempPower +
                 '}';
     }
 }
