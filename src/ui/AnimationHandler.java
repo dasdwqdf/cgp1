@@ -29,7 +29,7 @@ public class AnimationHandler {
     boolean healAnimation = false;
     boolean manaAnimation = false;
 
-    int totalManaSprites = 5;
+    int totalSprites = 5;
     int animationSpeed = 20;
 
     public AnimationHandler(GamePanel gamePanel) {
@@ -86,27 +86,50 @@ public class AnimationHandler {
     }
 
     public  void drawHealAnimation(Graphics2D g2d) {
-        healAnimationCounter++;
-        if (healAnimationCounter >= animationSpeed) {
-            healAnimationCounter = 0;
-            healAnimation = false;
+        int currentSpriteIndex = healAnimationCounter / (animationSpeed / totalSprites);
+
+        if (currentSpriteIndex >= totalSprites) {
+            healAnimationCounter = 0; // Reseta o contador para futuras animações
+            healAnimation = false;    // Finaliza a animação
+            return;                   // Interrompe o desenho após o último sprite
         }
 
+        // Calcula as coordenadas com base no alvo (jogador ou bot)
         int x = target == 1 ? playerMenuX : botMenuX;
         int y = target == 1 ? playerMenuY : botMenuY;
 
-        BufferedImage characterSprite = switch (target) {
-            case 1 -> spritesHandler.getPlayerHeal();
-            default -> spritesHandler.getBotHeal();
+        // Obtém o sprite correspondendo ao índice atual
+        BufferedImage characterSprite = target == 1
+                ? switch (currentSpriteIndex) {
+            case 0 -> spritesHandler.getPlayerHeal0();
+            case 1 -> spritesHandler.getPlayerHeal1();
+            case 2 -> spritesHandler.getPlayerHeal2();
+            case 3 -> spritesHandler.getPlayerHeal3();
+            case 4 -> spritesHandler.getPlayerHeal4();
+            default -> null; // Fallback, nunca deve ocorrer
+        }
+                : switch (currentSpriteIndex) {
+            case 0 -> spritesHandler.getBotHeal0();
+            case 1 -> spritesHandler.getBotHeal1();
+            case 2 -> spritesHandler.getBotHeal2();
+            case 3 -> spritesHandler.getBotHeal3();
+            case 4 -> spritesHandler.getBotHeal4();
+            default -> null; // Fallback, nunca deve ocorrer
         };
 
-        g2d.drawImage(characterSprite, x, y, 2*gamePanel.tileSize, 2*gamePanel.tileSize, null);
+        if (characterSprite != null) {
+            // Desenha o sprite na posição calculada
+            g2d.drawImage(characterSprite, x, y, 2 * gamePanel.tileSize, 2 * gamePanel.tileSize, null);
+        }
+
+        // Incrementa o contador geral da animação
+        healAnimationCounter++;
     }
 
     public void drawManaAnimation(Graphics2D g2d) {
-        int currentSpriteIndex = manaAnimationCounter / (animationSpeed / totalManaSprites);
+        int currentSpriteIndex = manaAnimationCounter / (animationSpeed / totalSprites);
 
-        if (currentSpriteIndex >= totalManaSprites) {
+        if (currentSpriteIndex >= totalSprites) {
             manaAnimationCounter = 0; // Reseta o contador para futuras animações
             manaAnimation = false;    // Finaliza a animação
             return;                   // Interrompe o desenho após o último sprite

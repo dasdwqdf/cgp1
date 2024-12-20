@@ -1,6 +1,7 @@
 package utils;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -13,7 +14,11 @@ public class SpritesHandler {
     public BufferedImage playerIdle0;
     public BufferedImage playerIdle1;
     public BufferedImage playerDamage;
-    public BufferedImage playerHeal;
+    public BufferedImage playerHeal0;
+    public BufferedImage playerHeal1;
+    public BufferedImage playerHeal2;
+    public BufferedImage playerHeal3;
+    public BufferedImage playerHeal4;
     public BufferedImage playerMana0;
     public BufferedImage playerMana1;
     public BufferedImage playerMana2;
@@ -22,7 +27,11 @@ public class SpritesHandler {
     public BufferedImage botIdle0;
     public BufferedImage botIdle1;
     public BufferedImage botDamage;
-    public BufferedImage botHeal;
+    public BufferedImage botHeal0;
+    public BufferedImage botHeal1;
+    public BufferedImage botHeal2;
+    public BufferedImage botHeal3;
+    public BufferedImage botHeal4;
     public BufferedImage botMana0;
     public BufferedImage botMana1;
     public BufferedImage botMana2;
@@ -61,8 +70,24 @@ public class SpritesHandler {
         return playerDamage;
     }
 
-    public BufferedImage getPlayerHeal() {
-        return playerHeal;
+    public BufferedImage getPlayerHeal0() {
+        return playerHeal0;
+    }
+
+    public BufferedImage getPlayerHeal1() {
+        return playerHeal1;
+    }
+
+    public BufferedImage getPlayerHeal2() {
+        return playerHeal2;
+    }
+
+    public BufferedImage getPlayerHeal3() {
+        return playerHeal3;
+    }
+
+    public BufferedImage getPlayerHeal4() {
+        return playerHeal4;
     }
 
     public BufferedImage getPlayerMana0() {
@@ -97,8 +122,24 @@ public class SpritesHandler {
         return botDamage;
     }
 
-    public BufferedImage getBotHeal() {
-        return botHeal;
+    public BufferedImage getBotHeal0() {
+        return botHeal0;
+    }
+
+    public BufferedImage getBotHeal1() {
+        return botHeal1;
+    }
+
+    public BufferedImage getBotHeal2() {
+        return botHeal2;
+    }
+
+    public BufferedImage getBotHeal3() {
+        return botHeal3;
+    }
+
+    public BufferedImage getBotHeal4() {
+        return botHeal4;
     }
 
     public BufferedImage getBotMana0() {
@@ -130,7 +171,11 @@ public class SpritesHandler {
             playerIdle0 = ImageIO.read(getClass().getResource("/characters/player-idle-0.png"));
             playerIdle1 = ImageIO.read(getClass().getResource("/characters/player-idle-1.png"));
             playerDamage = ImageIO.read(getClass().getResource("/characters/player-damage.png"));
-            playerHeal = ImageIO.read(getClass().getResource("/characters/player-heal.png"));
+            playerHeal0 = ImageIO.read(getClass().getResource("/characters/player-heal-0.png"));
+            playerHeal1 = ImageIO.read(getClass().getResource("/characters/player-heal-1.png"));
+            playerHeal2 = ImageIO.read(getClass().getResource("/characters/player-heal-2.png"));
+            playerHeal3 = ImageIO.read(getClass().getResource("/characters/player-heal-3.png"));
+            playerHeal4 = ImageIO.read(getClass().getResource("/characters/player-heal-4.png"));
             playerMana0 = ImageIO.read(getClass().getResource("/characters/player-mana-0.png"));
             playerMana1 = ImageIO.read(getClass().getResource("/characters/player-mana-1.png"));
             playerMana2 = ImageIO.read(getClass().getResource("/characters/player-mana-2.png"));
@@ -139,7 +184,11 @@ public class SpritesHandler {
             botIdle0 = ImageIO.read(getClass().getResource("/characters/bot-idle-0.png"));
             botIdle1 = ImageIO.read(getClass().getResource("/characters/bot-idle-1.png"));
             botDamage = ImageIO.read(getClass().getResource("/characters/bot-damage.png"));
-            botHeal = ImageIO.read(getClass().getResource("/characters/bot-heal.png"));
+            botHeal0 = ImageIO.read(getClass().getResource("/characters/bot-heal-0.png"));
+            botHeal1 = ImageIO.read(getClass().getResource("/characters/bot-heal-1.png"));
+            botHeal2 = ImageIO.read(getClass().getResource("/characters/bot-heal-2.png"));
+            botHeal3 = ImageIO.read(getClass().getResource("/characters/bot-heal-3.png"));
+            botHeal4 = ImageIO.read(getClass().getResource("/characters/bot-heal-4.png"));
             botMana0 = ImageIO.read(getClass().getResource("/characters/bot-mana-0.png"));
             botMana1 = ImageIO.read(getClass().getResource("/characters/bot-mana-1.png"));
             botMana2 = ImageIO.read(getClass().getResource("/characters/bot-mana-2.png"));
