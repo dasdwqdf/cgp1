@@ -1,5 +1,6 @@
 package game.controller;
 
+import game.sound.Sound;
 import ui.BattleMenuUI;
 import game.states.GameState;
 import game.input.KeyHandler;
@@ -10,8 +11,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GamePanel extends JPanel implements Runnable {
-
-    public final SpritesHandler spritesHandler = new SpritesHandler();
 
     // Configurações da Tela
     public final int originalTileSize = 16; // 16x16 tile
@@ -25,7 +24,18 @@ public class GamePanel extends JPanel implements Runnable {
 
     public Thread gameThread;
 
+    // Sprites
+    public final SpritesHandler spritesHandler = new SpritesHandler();
+
+    // Audio
+    public Sound sound = new Sound();
+    public float musicVolume = -30.0f;
+    public float soundVolume = -30.0f;
+
+    // KeyHandler
     public KeyHandler keyHandler = new KeyHandler(this);
+
+    // GameState
     public GameState gameState = GameState.TITLE_STATE;
 
     // UIs
@@ -38,6 +48,11 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyHandler);
         this.setFocusable(true);
+        initAudio();
+    }
+
+    public void initAudio() {
+        this.playMusic(0);
     }
 
     public void startGameThread() {
@@ -103,5 +118,22 @@ public class GamePanel extends JPanel implements Runnable {
                 battleMenuUI.draw(g2d);
                 break;
         }
+    }
+
+    public void playMusic(int i) {
+        sound.setFile(i);
+        sound.setVolume(musicVolume);
+        sound.play();
+        sound.loop();
+    }
+
+    public void stopMusic() {
+        sound.stop();
+    }
+
+    public void playSE(int i) {
+        sound.setFile(i);
+        sound.setVolume(soundVolume);
+        sound.play();
     }
 }

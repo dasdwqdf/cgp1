@@ -78,8 +78,8 @@ public class PlayerMenu extends Menu {
         }
 
         // Coordenadas
-        int tempX = menuX;
-        int tempY = menuY;
+        int tempX = menuX + 5;
+        int tempY = menuY + 5;
 
         BufferedImage characterPortrait = getAvatarPortrait();
         g2d.drawImage(characterPortrait, tempX, tempY, gamePanel.tileSize * 2, gamePanel.tileSize * 2, null);

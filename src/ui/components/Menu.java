@@ -10,7 +10,7 @@ public class Menu extends UI {
     Font menuFont = defaultFont.deriveFont(Font.BOLD, 32);
 
     Color shadowColor = new Color(25, 25, 25, 255);
-    Color menuColor = new Color(250, 205, 200, 255);
+    Color menuColor = new Color(250, 200, 120 , 255);
     Color borderColor = new Color(235, 105, 90, 255);
 
     // Variáveis do Menu

@@ -103,7 +103,7 @@ public class CombatPhaseHandler {
             firstPlayer.receiveDamage(secondPlayerCard.getDirectDamage());
 
             String noFieldCardMessage = firstPlayer.getName() + " não colocou nenhuma carta em campo.";
-            String winMessage = secondPlayer.getName() + " atacou com " + secondPlayerCard.getName();
+            String winMessage = secondPlayer.getName() + " atacou com " + secondPlayerCard.getName() + ".";
             String damageMessage = firstPlayer.getName() + " recebeu "+ secondPlayerCard.getDirectDamage() +" de dano.";
 
             newBattleMessageHandler.addMessage(new BattleMessage(noFieldCardMessage, BattleMessageType.SIMPLE));
@@ -115,7 +115,7 @@ public class CombatPhaseHandler {
             secondPlayer.receiveDamage(firstPlayerCard.getDirectDamage());
 
             String noFieldCardMessage = secondPlayer.getName() + " não colocou nenhuma carta em campo.";
-            String winMessage = firstPlayer.getName() + " atacou com " + firstPlayerCard.getName();
+            String winMessage = firstPlayer.getName() + " atacou com " + firstPlayerCard.getName() + ".";
             String damageMessage = secondPlayer.getName() + " recebeu "+ firstPlayerCard.getDirectDamage() + " de dano.";
 
             newBattleMessageHandler.addMessage(new BattleMessage(noFieldCardMessage, BattleMessageType.SIMPLE));

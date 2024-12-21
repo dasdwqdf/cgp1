@@ -4,6 +4,7 @@ import game.battle.Battle;
 import game.battle.BattleMessageHandler;
 import game.battle.BattleState;
 import game.cards.Card;
+import game.controller.GamePanel;
 import game.input.KeyHandler;
 import game.message.BattleMessage;
 import game.message.BattleMessageType;
@@ -17,6 +18,8 @@ public class BattleMenuController {
 
     public boolean gameOver = false;
 
+
+    GamePanel gamePanel;
     AnimationHandler animationHandler;
     KeyHandler keyHandler;
 
@@ -31,7 +34,6 @@ public class BattleMenuController {
     }
     public enum BattleMenuOption {
         MAO,
-        CHECAR,
         ENCERRAR
     }
 
@@ -41,14 +43,15 @@ public class BattleMenuController {
 
     List<Card> playerHand;
     Integer handSize;
-    BattleMessageHandler battleMessageHandler;
     NewBattleMessageHandler newBattleMessageHandler;
 
-    public BattleMenuController(AnimationHandler animationHandler, KeyHandler keyHandler, Battle battle, PlayerView playerView, PlayerView opponentView) {
+    int currentTurn;
+
+    public BattleMenuController(GamePanel gamePanel, AnimationHandler animationHandler, KeyHandler keyHandler, Battle battle, PlayerView playerView, PlayerView opponentView) {
+        this.gamePanel = gamePanel;
         this.animationHandler = animationHandler;
         this.keyHandler = keyHandler;
         this.battle = battle;
-        this.battleMessageHandler = battle.getBattleMessageHandler();
         this.newBattleMessageHandler = battle.getNewBattleMessageHandler();
         this.playerView = playerView;
         this.opponentView = opponentView;
@@ -56,6 +59,7 @@ public class BattleMenuController {
         this.currentOption = BattleMenuOption.MAO;
         this.currentSelectedCardIndex = 0;
         this.playerHand = battle.getPlayers().get(0).getCardManager().getHand();
+        this.currentTurn = 1;
     }
 
     public void update() {
@@ -81,17 +85,21 @@ public class BattleMenuController {
     private void handleSelectCard() {
         if (keyHandler.rightPressed) {
             currentSelectedCardIndex = (currentSelectedCardIndex < handSize-1) ? currentSelectedCardIndex + 1 : 0;
+            gamePanel.playSE(2);
             keyHandler.rightPressed = false;
 
         } else if (keyHandler.leftPressed) {
             currentSelectedCardIndex = (currentSelectedCardIndex > 0) ? currentSelectedCardIndex - 1 : handSize-1;
+            gamePanel.playSE(2);
             keyHandler.leftPressed = false;
 
         } else if (keyHandler.zPressed) {
             currentMode = BattleMenuMode.SELECT_OPTION;
+            gamePanel.playSE(2);
             keyHandler.zPressed = false;
 
         } else if (keyHandler.xPressed) {
+            gamePanel.playSE(3);
             Card currentCard = playerHand.get(currentSelectedCardIndex);
             battle.playCard(currentCard);
             handSize = playerHand.size();
@@ -105,10 +113,12 @@ public class BattleMenuController {
     private void handleDiscardCard() {
         if (keyHandler.rightPressed) {
             currentSelectedCardIndex = (currentSelectedCardIndex < handSize-1) ? currentSelectedCardIndex + 1 : 0;
+            gamePanel.playSE(2);
             keyHandler.rightPressed = false;
 
         } else if (keyHandler.leftPressed) {
             currentSelectedCardIndex = (currentSelectedCardIndex > 0) ? currentSelectedCardIndex - 1 : handSize-1;
+            gamePanel.playSE(2);
             keyHandler.leftPressed = false;
 
         } else if (keyHandler.xPressed) {
@@ -123,26 +133,28 @@ public class BattleMenuController {
     }
 
     private void handleSelectOption() {
-
         if (keyHandler.rightPressed) {
             currentOption = switch (currentOption) {
-                case MAO -> BattleMenuOption.CHECAR;
-                case CHECAR -> BattleMenuOption.ENCERRAR;
+                case MAO -> BattleMenuOption.ENCERRAR;
                 case ENCERRAR -> BattleMenuOption.MAO;
             };
 
+            gamePanel.playSE(2);
             keyHandler.rightPressed = false;
 
         } else if (keyHandler.leftPressed) {
             currentOption = switch (currentOption) {
                 case MAO -> BattleMenuOption.ENCERRAR;
-                case CHECAR -> BattleMenuOption.MAO;
-                case ENCERRAR -> BattleMenuOption.CHECAR;
+                case ENCERRAR -> BattleMenuOption.MAO;
             };
 
+            gamePanel.playSE(2);
             keyHandler.leftPressed = false;
 
         } else if (keyHandler.xPressed) {
+
+            gamePanel.playSE(3); // Efeito
+
             if (currentOption.equals(BattleMenuOption.MAO)) {
                 // Atualizamos a variável de controle do tamanho da mão
                 this.handSize = Math.min(playerHand.size(), 6);
@@ -171,6 +183,7 @@ public class BattleMenuController {
         }
 
         if (keyHandler.xPressed) {
+            gamePanel.playSE(3);
             BattleMessage battleMessage = newBattleMessageHandler.consumeMessage();
             handleMessageType(battleMessage);
             keyHandler.xPressed = false;
@@ -191,6 +204,9 @@ public class BattleMenuController {
                 break;
 
             case DAMAGE:
+                // SE Dano
+                gamePanel.playSE(4);
+
                 // Animação de Dano
                 animationHandler.enableDamageAnimation(target);
 
@@ -205,6 +221,9 @@ public class BattleMenuController {
                 break;
 
             case REGEN_MANA:
+                // SE Mana
+                gamePanel.playSE(5);
+
                 // Animação de Mana
                 animationHandler.enableManaAnimation(target);
 
@@ -227,6 +246,9 @@ public class BattleMenuController {
                 break;
 
             case FIELD_CARD:
+                // SE placeCard
+                gamePanel.playSE(9);
+
                 if (target == 1) {
                     playerView.updateMana();
                     playerView.updateFieldCard();
@@ -239,17 +261,14 @@ public class BattleMenuController {
                 break;
 
             case EFFECT_CARD:
-                if (target == 1) {
-                    // mais código depois aqui
-                    playerView.updateMana();
-
-                } else {
-                    opponentView.updateMana();
-                }
-
+                playerView.updateMana();
+                opponentView.updateMana();
                 break;
 
             case HEAL_EFFECT:
+                // SE Heal
+                gamePanel.playSE(6);
+
                 // Animação de Heal
                 animationHandler.enableHealAnimation(target);
 
@@ -264,6 +283,9 @@ public class BattleMenuController {
                 break;
 
             case POWER_UP_EFFECT:
+                // SE PowerUp
+                gamePanel.playSE(7);
+
                 // Animação de Power UP
                 if (target == 1) {
                     animationHandler.enablePlayerPowerUpAnimation();
@@ -289,11 +311,15 @@ public class BattleMenuController {
                 break;
 
             case ELEMENTAL_POWER_UP:
+                // SE PowerUp
+                gamePanel.playSE(7);
                 animationHandler.enableElementalPowerUpAnimation();
                 playerView.updateFieldCard();
                 break;
 
             case ELEMENTAL_POWER_DOWN:
+                // SE PoweDown
+                gamePanel.playSE(8);
                 animationHandler.enableElementalPowerDownAnimation();
                 playerView.updateFieldCard();
                 break;
@@ -312,6 +338,7 @@ public class BattleMenuController {
                 battle.consumeFieldCards();
                 playerView.updateFieldCard();
                 opponentView.updateFieldCard();
+                currentTurn++;
                 break;
 
             case GAME_FINISHED:
@@ -354,5 +381,9 @@ public class BattleMenuController {
 
     public List<Card> getPlayerHand() {
         return playerHand;
+    }
+
+    public int getCurrentTurn() {
+        return currentTurn;
     }
 }

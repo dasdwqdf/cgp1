@@ -28,6 +28,9 @@ public class MainMenuUI extends UI {
         } else if (keyHandler.enterPressed) {
 
             if (currentSelected == SelectedOption.PLAY) {
+                gamePanel.stopMusic();
+                gamePanel.playSE(3);
+                gamePanel.playMusic(1);
                 gamePanel.battleMenuUI.newBattle();
                 gamePanel.gameState = GameState.PLAY_STATE;
 

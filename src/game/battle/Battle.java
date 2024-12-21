@@ -219,12 +219,14 @@ public class Battle {
                 return true;
 
             case EFFECT:
-                // Retiramos a carta da mão do jogador e consumimos a mana
-                cardManager.useCard(card);
-                currentPlayer.consumeMana(card.getManaCost());
-
                 // Aplicamos o efeito utilizando o handler de efeitos
-                effectHandler.handleEffect(currentPlayer, card);
+                boolean used = effectHandler.handleEffect(currentPlayer, card);
+
+                if (used) {
+                    // Retiramos a carta da mão do jogador e consumimos a mana
+                    cardManager.useCard(card);
+                    currentPlayer.consumeMana(card.getManaCost());
+                }
 
                 return true;
 
@@ -271,7 +273,8 @@ public class Battle {
         if (winner != null) {
             // Mensagem de fim de partida
             String message = winner.getName() + " venceu a batalha.";
-            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.GAME_FINISHED));
+            int target = players.indexOf(winner) + 1;
+            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.GAME_FINISHED, target));
         }
     }
 

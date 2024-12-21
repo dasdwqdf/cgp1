@@ -9,13 +9,15 @@ import java.awt.image.BufferedImage;
 public class AnimationHandler {
 
     GamePanel gamePanel;
-    Color backgroundColor = new Color(225,225,200);
+    Color backgroundColor = new Color(246, 167, 36);
     SpritesHandler spritesHandler;
 
     int botMenuX = 336;
     int botMenuY = 48;
     int playerMenuX = 48;
     int playerMenuY = 240;
+
+    int margin = 5;
 
     int transitionAnimationCounter = 0;
     public boolean transitionAnimation = false;
@@ -37,7 +39,7 @@ public class AnimationHandler {
     boolean elementalPowerDownAnimation = false;
 
     int totalSprites = 5;
-    int animationSpeed = 20;
+    int animationSpeed = 30;
 
     public AnimationHandler(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
@@ -181,15 +183,15 @@ public class AnimationHandler {
     }
 
     public void drawPlayerPowerUpAnimation(Graphics2D g2d) {
-        int x = playerMenuX;
-        int y = playerMenuY;
+        int x = playerMenuX + margin;
+        int y = playerMenuY + margin;
 
         drawPowerUpAnimation(g2d, x, y);
     }
 
     public void drawBotPowerUpAnimation(Graphics2D g2d) {
-        int x = botMenuX;
-        int y = botMenuY;
+        int x = botMenuX + margin;
+        int y = botMenuY + margin;
 
         drawPowerUpAnimation(g2d, x, y);
     }
@@ -209,7 +211,7 @@ public class AnimationHandler {
           default -> spritesHandler.getBotDamage();
         };
 
-        g2d.drawImage(characterSprite, x, y, 2*gamePanel.tileSize, 2*gamePanel.tileSize, null);
+        g2d.drawImage(characterSprite, x + margin, y + margin, 2*gamePanel.tileSize, 2*gamePanel.tileSize, null);
     }
 
     public  void drawHealAnimation(Graphics2D g2d) {
@@ -246,7 +248,7 @@ public class AnimationHandler {
 
         if (characterSprite != null) {
             // Desenha o sprite na posição calculada
-            g2d.drawImage(characterSprite, x, y, 2 * gamePanel.tileSize, 2 * gamePanel.tileSize, null);
+            g2d.drawImage(characterSprite, x + margin, y + margin, 2 * gamePanel.tileSize, 2 * gamePanel.tileSize, null);
         }
 
         // Incrementa o contador geral da animação
@@ -287,7 +289,7 @@ public class AnimationHandler {
 
         if (characterSprite != null) {
             // Desenha o sprite na posição calculada
-            g2d.drawImage(characterSprite, x, y, 2 * gamePanel.tileSize, 2 * gamePanel.tileSize, null);
+            g2d.drawImage(characterSprite, x + margin, y + margin, 2 * gamePanel.tileSize, 2 * gamePanel.tileSize, null);
         }
 
         // Incrementa o contador geral da animação

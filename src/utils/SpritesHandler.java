@@ -6,7 +6,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class SpritesHandler {
-
+    public BufferedImage background;
+    public BufferedImage coconut;
     public BufferedImage deck;
     public BufferedImage filledMana;
     public BufferedImage emptyMana;
@@ -44,6 +45,14 @@ public class SpritesHandler {
 
     public SpritesHandler() {
         loadSprites();
+    }
+
+    public BufferedImage getBackground() {
+        return background;
+    }
+
+    public BufferedImage getCoconut() {
+        return coconut;
     }
 
     public BufferedImage getDeck() {
@@ -184,6 +193,8 @@ public class SpritesHandler {
 
     private void loadSprites() {
         try {
+            background = ImageIO.read(getClass().getResource("/background/bg.jpg"));
+            coconut = ImageIO.read(getClass().getResource("/background/coconut.png"));
             deck = ImageIO.read(getClass().getResource("/decks/deck.png"));
             filledMana = ImageIO.read(getClass().getResource("/status/filled-mana.png"));
             emptyMana = ImageIO.read(getClass().getResource("/status/empty-mana.png"));

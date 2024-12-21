@@ -10,6 +10,7 @@ import game.states.GameState;
 import game.view.PlayerView;
 import ui.AnimationHandler;
 import ui.controllers.BattleMenuController;
+import utils.SpritesHandler;
 import utils.Utils;
 
 import java.awt.*;
@@ -17,11 +18,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class BattleMenu extends Menu {
-
-    Color backgroundColor = new Color(0, 0, 0);
-
     // Batalha
     Battle battle;
+
+    // Sprites
+    SpritesHandler spritesHandler;
 
     // UI's
     PlayerMenu playerUI, opponentUI;
@@ -30,18 +31,29 @@ public class BattleMenu extends Menu {
     // Controllers
     BattleMenuController battleMenuController;
 
+    // Background
+    int backgroundX = 0;
+    int backgroundY = -20;
+
     // Animações
     AnimationHandler animationHandler;
-    Integer animationCounter = 0;
+    int turnAnimationCounter = 0;
+    int cursorAnimationCounter = 0;
 
     public BattleMenu(GamePanel gamePanel, Battle battle) {
         super(gamePanel);
+        this.spritesHandler = gamePanel.spritesHandler;
         this.animationHandler = new AnimationHandler(gamePanel);
-        animationHandler.transitionAnimation = true;
+        this.animationHandler.transitionAnimation = true;
         this.battle = battle;
+
         initMenus();
-        battle.startBattle();
+        startBattle();
         initBattleMenuDefaultValues();
+    }
+
+    private void startBattle() {
+        battle.startBattle();
     }
 
     private void initMenus() {
@@ -56,7 +68,7 @@ public class BattleMenu extends Menu {
         this.opponentUI = new PlayerMenu(gamePanel, PlayerMenuType.OPPONENT, opponentView);
 
         // Controller do Menu de Batalha
-        this.battleMenuController = new BattleMenuController(animationHandler, gamePanel.keyHandler, battle, playerView, opponentView);
+        this.battleMenuController = new BattleMenuController(gamePanel, animationHandler, gamePanel.keyHandler, battle, playerView, opponentView);
 
         // UI descrição de cartas
         this.cardMenu = new CardMenu(gamePanel, battleMenuController);
@@ -87,6 +99,9 @@ public class BattleMenu extends Menu {
         // Desenha o plano de fundo
         drawBackground(g2d);
 
+        // Desenha o turno da batalha
+        drawTurn(g2d);
+
         // Desenha a caixa de opções
         drawMenuWindow(g2d);
 
@@ -116,10 +131,40 @@ public class BattleMenu extends Menu {
     }
 
     public void drawBackground(Graphics2D g2d) {
-        int width = gamePanel.screenWidth;
-        int height = gamePanel.screenHeight;
-        g2d.setColor(backgroundColor);
-        g2d.fillRect(0, 0, width, height);
+        BufferedImage bg = spritesHandler.getBackground();
+        g2d.drawImage(bg, backgroundX, backgroundY, bg.getWidth()/3, (int)bg.getHeight()/3, null);
+    }
+
+    public void drawTurn(Graphics2D g2d) {
+        turnAnimationCounter++;
+
+        // Coordenadas
+        int tempX = 5;
+        int tempY = 5;
+
+        // Fundo
+        g2d.setColor(Color.orange);
+        g2d.fillRoundRect(tempX, tempY, 4*gamePanel.tileSize, gamePanel.tileSize + 10, 5, 5);
+
+        // Atualiza as coordenadas
+        tempX += 5;
+        tempY += 5;
+
+        // Coconut Logo
+        BufferedImage coconut = spritesHandler.getCoconut();
+        g2d.drawImage(coconut, tempX, tempY, gamePanel.tileSize, gamePanel.tileSize, null);
+
+        // Atualiza as coordenadas
+        tempX += gamePanel.tileSize + 5;
+        tempY += gamePanel.tileSize - 16;
+
+        String turno = "TURNO > " + battleMenuController.getCurrentTurn();
+        g2d.setFont(menuFont.deriveFont(24f));
+        g2d.setColor(Color.red);
+
+        if (turnAnimationCounter <= 20) g2d.drawString(turno, tempX, tempY); else g2d.drawString(turno, tempX, tempY + 1);
+
+        if (turnAnimationCounter >= 40) turnAnimationCounter = 0;
     }
 
     public void drawBattleMenuOptions(Graphics2D g2d) {
@@ -127,42 +172,38 @@ public class BattleMenu extends Menu {
         g2d.setColor(Color.black);
         g2d.setFont(menuFont);
 
-        int optionsSize = menuWidth/3;
+        int optionsSize = menuWidth/2;
         int x = menuX + gamePanel.tileSize;
         int y = menuY + menuHeight/2 + borderSize;
 
         g2d.drawString("MÂO", x, y);
 
         x = x + optionsSize;
-        g2d.drawString("CHECAR", x, y);
-
-        x = x + optionsSize;
-        g2d.drawString("ENCERRAR", x, y);
+        g2d.drawString("ENCERRAR TURNO", x, y);
     }
 
     public void drawBattleOptionCursor(Graphics2D g2d) {
-        int optionsSize = menuWidth/3;
+        int optionsSize = menuWidth/2;
 
         int baseX = menuX + gamePanel.tileSize/2;
         int y = menuY + menuHeight/2 + borderSize;
 
         int x = switch(battleMenuController.getCurrentOption()) {
             case MAO -> baseX;
-            case CHECAR -> baseX + optionsSize;
-            case ENCERRAR -> baseX + 2 * optionsSize;
+            case ENCERRAR -> baseX + optionsSize;
         };
 
         g2d.setColor(Color.black);
 
         // Animação para o cursor
         // a cada 15 frames o cursor pisca brevemente
-        if (animationCounter < 15) {
+        if (cursorAnimationCounter < 15) {
             g2d.drawString(">", x, y);
-        }  else if (animationCounter > 30) {
-            animationCounter = 0;
+        }  else if (cursorAnimationCounter > 30) {
+            cursorAnimationCounter = 0;
         }
 
-        animationCounter++;
+        cursorAnimationCounter++;
     }
 
     public void drawHand(Graphics2D g2d, List<Card> hand) {
@@ -208,13 +249,13 @@ public class BattleMenu extends Menu {
 
         // Animação para o cursor
         // a cada 15 frames o cursor pisca brevemente
-        if (animationCounter < 15) {
+        if (cursorAnimationCounter < 15) {
             g2d.drawString(">", x, y);
-        }  else if (animationCounter > 30) {
-            animationCounter = 0;
+        }  else if (cursorAnimationCounter > 30) {
+            cursorAnimationCounter = 0;
         }
 
-        animationCounter++;
+        cursorAnimationCounter++;
     }
 
     public void drawMessageCursor(Graphics2D g2d) {
@@ -225,13 +266,13 @@ public class BattleMenu extends Menu {
 
         // Animação para o cursor
         // a cada 15 frames o cursor pisca brevemente
-        if (animationCounter < 15) {
+        if (cursorAnimationCounter < 15) {
             g2d.drawString("v", x, y);
-        }  else if (animationCounter > 30) {
-            animationCounter = 0;
+        }  else if (cursorAnimationCounter > 30) {
+            cursorAnimationCounter = 0;
         }
 
-        animationCounter++;
+        cursorAnimationCounter++;
     }
 
     public void drawMessage(Graphics2D g2d) {
@@ -252,32 +293,5 @@ public class BattleMenu extends Menu {
         for (int i = 0; i < lines.length; i++) {
             g2d.drawString(lines[i], x, baseY + i * gamePanel.tileSize);
         }
-    }
-
-    public void drawPlayersStatus(Graphics2D g2d) {
-        PlayerEntity player1 = battle.getPlayers().get(0);
-        PlayerEntity player2 = battle.getPlayers().get(1);
-        drawPlayerStatus(g2d, PlayerStatusPosition.TOP_LEFT, player1);
-        drawPlayerStatus(g2d, PlayerStatusPosition.TOP_RIGHT, player2);
-    }
-
-    public void drawPlayerStatus(Graphics2D g2d, PlayerStatusPosition position, PlayerEntity player) {
-        // Textos
-        String playerName = player.getName();
-        String playerHp = String.valueOf(player.getHp());
-
-        // Tamanho do texto
-        int textWidth = Utils.calculateTextWidth(g2d, menuFont, playerName);
-
-        // Posição
-        int x = position.getX(gamePanel.getWidth(), textWidth);
-        int y = position.getY();
-
-        // Fonte e Cor dos textos
-        g2d.setColor(Color.black);
-        g2d.setFont(menuFont);
-
-        g2d.drawString(playerName, x, y);
-        g2d.drawString(playerHp, x, y + gamePanel.tileSize/2 + 8);
     }
 }

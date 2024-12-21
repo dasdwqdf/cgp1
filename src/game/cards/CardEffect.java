@@ -1,7 +1,7 @@
 package game.cards;
 
 public enum CardEffect {
-    REDRAW, DRAW, BUFF, DEBUFF, HEAL;
+    REDRAW, DRAW, BUFF, HEAL, MANA;
 
     public static CardEffect fromString(String name) {
         for (CardEffect effect : CardEffect.values()) {
