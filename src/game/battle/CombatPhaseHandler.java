@@ -43,25 +43,6 @@ public class CombatPhaseHandler {
                 newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_DOWN));
             }
 
-            CardElement elemento1 = firstPlayerCard.getCardElement();
-            CardElement elemento2 = secondPlayerCard.getCardElement();
-
-            // Aplicamos as vantagens/desvantagens elementais
-            int elementalAdvantage = ElementalAdvantage.getAdvantage(elemento1, elemento2);
-            firstPlayerCard.addTempPower(elementalAdvantage);
-
-            System.out.println(firstPlayerCard);
-
-            // Mensagens para caso seja aplicado alguma vantagem/desvantagem
-            if (elementalAdvantage > 0) {
-                String elementalMessage = elemento1.name() + " é efetivo contra " + elemento2.name() + ", +2 de poder para " + firstPlayerCard.getName();
-                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_UP));
-
-            } else if (elementalAdvantage < 0) {
-                String elementalMessage = elemento1.name() + " é fraco contra " + elemento2.name() + ", -2 de poder para " + firstPlayerCard.getName();
-                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_DOWN));
-            }
-
             // Aplicamos os aprimoramentos das cartas em campo
             int firstPlayerTotalPower = firstPlayerCard.getTotalPower();
             int secondPlayerTotalPower = secondPlayerCard.getTotalPower();
