@@ -1,8 +1,8 @@
 package ui.components;
 
 import game.battle.Battle;
-import game.cards.Card;
-import game.cards.CardManager;
+import game.card.Card;
+import game.card.CardManager;
 import game.controller.GamePanel;
 import game.entity.PlayerEntity;
 import game.message.NewBattleMessageHandler;

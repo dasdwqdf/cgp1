@@ -1,9 +1,8 @@
 package ui.controllers;
 
 import game.battle.Battle;
-import game.battle.BattleMessageHandler;
 import game.battle.BattleState;
-import game.cards.Card;
+import game.card.Card;
 import game.controller.GamePanel;
 import game.input.KeyHandler;
 import game.message.BattleMessage;
@@ -185,19 +184,23 @@ public class BattleMenuController {
         if (keyHandler.xPressed) {
             gamePanel.playSE(3);
             BattleMessage battleMessage = newBattleMessageHandler.consumeMessage();
-            handleMessageType(battleMessage);
+            handleBattleMessage(battleMessage);
             keyHandler.xPressed = false;
         }
     }
 
-    private void handleMessageType(BattleMessage battleMessage) {
+    private void handleBattleMessage(BattleMessage battleMessage) {
         // Resgatamos o tipo da mensagem de batalha
         BattleMessageType battleMessageType = battleMessage.getType();
 
-        // O alvo da aplicação do efeito
+        // Resgata o alvo
         int target = battleMessage.getTarget();
 
         System.out.println(battleMessage);
+
+        // Uma snapshot do jogador
+        PlayerView playerSnapshot = battleMessage.getPlayerSnapshot();
+
 
         switch (battleMessageType) {
             case SIMPLE:
@@ -210,14 +213,6 @@ public class BattleMenuController {
                 // Animação de Dano
                 animationHandler.enableDamageAnimation(target);
 
-                if (target == 1) {
-                    // Animação de Dano
-                    playerView.updateHp();
-
-                } else {
-                    opponentView.updateHp();
-                }
-
                 break;
 
             case REGEN_MANA:
@@ -226,19 +221,9 @@ public class BattleMenuController {
 
                 // Animação de Mana
                 animationHandler.enableManaAnimation(target);
-
-                if (target == 1) {
-                    playerView.updateMana();
-
-                } else {
-                    opponentView.updateMana();
-                }
-
                 break;
 
             case DRAW_CARD:
-                playerView.updateNuCardsDeck();
-                opponentView.updateNuCardsDeck();
                 break;
 
             case DISCARD_CARD:
@@ -248,21 +233,9 @@ public class BattleMenuController {
             case FIELD_CARD:
                 // SE placeCard
                 gamePanel.playSE(9);
-
-                if (target == 1) {
-                    playerView.updateMana();
-                    playerView.updateFieldCard();
-
-                } else {
-                    opponentView.updateMana();
-                    opponentView.updateFieldCard();
-                }
-
                 break;
 
             case EFFECT_CARD:
-                playerView.updateMana();
-                opponentView.updateMana();
                 break;
 
             case HEAL_EFFECT:
@@ -271,14 +244,6 @@ public class BattleMenuController {
 
                 // Animação de Heal
                 animationHandler.enableHealAnimation(target);
-
-                if (target == 1) {
-                    // mais código
-                    playerView.updateHp();
-
-                } else {
-                    opponentView.updateHp();
-                }
 
                 break;
 
@@ -289,22 +254,14 @@ public class BattleMenuController {
                 // Animação de Power UP
                 if (target == 1) {
                     animationHandler.enablePlayerPowerUpAnimation();
-                    playerView.updateFieldCard();
 
                 } else {
                     animationHandler.enableBotPowerUpAnimation();
-                    opponentView.updateFieldCard();
                 }
 
                 break;
 
             case DRAW_EFFECT:
-                if (target == 1) {
-                    playerView.updateNuCardsDeck();
-                    handleDiscard();
-                } else {
-                    opponentView.updateNuCardsDeck();
-                }
                 break;
 
             case REDRAW_EFFECT:
@@ -314,14 +271,12 @@ public class BattleMenuController {
                 // SE PowerUp
                 gamePanel.playSE(7);
                 animationHandler.enableElementalPowerUpAnimation();
-                playerView.updateFieldCard();
                 break;
 
             case ELEMENTAL_POWER_DOWN:
                 // SE PoweDown
                 gamePanel.playSE(8);
                 animationHandler.enableElementalPowerDownAnimation();
-                playerView.updateFieldCard();
                 break;
 
             case BATTLE_PHASE_START:
@@ -345,6 +300,8 @@ public class BattleMenuController {
                 handleGameOver();
                 break;
         }
+
+        if (target == 1) playerView.updatePlayer(playerSnapshot); else opponentView.updatePlayer(playerSnapshot);
     }
 
     private void handleDiscard() {

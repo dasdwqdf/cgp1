@@ -1,12 +1,12 @@
 package game.battle;
 
-import game.cards.Card;
-import game.cards.CardEffect;
+import game.card.Card;
 import game.entity.AiEntity;
 import game.entity.PlayerEntity;
 import game.message.BattleMessage;
 import game.message.BattleMessageType;
 import game.message.NewBattleMessageHandler;
+import game.view.PlayerView;
 
 public class EffectHandler {
 
@@ -26,18 +26,21 @@ public class EffectHandler {
             case REDRAW -> handleRedrawEffect(player, card, target);
             case HEAL -> handleHealEffect(player, card, target);
             case BUFF -> handleBuffEffect(player, card, player.getFieldCard(), target);
-            case MANA -> handleManaEffect(player, card);
+            case MANA -> handleManaEffect(player, card, target);
         };
 
-        if (usedCard) battleMessageHandler.addMessage(new BattleMessage(cardMessage, BattleMessageType.EFFECT_CARD, target));
+        if (usedCard) {
+            player.consumeMana(card.getManaCost());
+            battleMessageHandler.addMessage(new BattleMessage(cardMessage, BattleMessageType.EFFECT_CARD, target, new PlayerView(player)));
+        }
 
         return usedCard;
     }
 
-    private boolean handleManaEffect(PlayerEntity player, Card card) {
+    private boolean handleManaEffect(PlayerEntity player, Card card, int target) {
         if (player.getMana() > 2) {
             String message = "Sua mana já está maximizada.";
-            battleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE));
+            battleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE, target));
 
             return false;
         }
@@ -46,7 +49,7 @@ public class EffectHandler {
         player.regenMana(card.getEffectArg());
 
         String regenManaMessage = player.getName() + " regenerou " + card.getEffectArg() + " de mana.";
-        battleMessageHandler.addMessage(new BattleMessage(regenManaMessage, BattleMessageType.REGEN_MANA));
+        battleMessageHandler.addMessage(new BattleMessage(regenManaMessage, BattleMessageType.REGEN_MANA, target, new PlayerView(player)));
 
         return true;
     }
@@ -64,7 +67,7 @@ public class EffectHandler {
         playerFieldCard.addTempPower(card.getEffectArg());
 
         String powerUpMessage = "O poder do campo de " + player.getName() + " foi aumentado em " + card.getEffectArg() + ".";
-        battleMessageHandler.addMessage(new BattleMessage(powerUpMessage, BattleMessageType.POWER_UP_EFFECT, target));
+        battleMessageHandler.addMessage(new BattleMessage(powerUpMessage, BattleMessageType.POWER_UP_EFFECT, target, new PlayerView(player)));
 
         return true;
     }
@@ -74,7 +77,7 @@ public class EffectHandler {
         player.heal(value);
 
         String healMessage = player.getName() + " recuperou " + value + " ponto(s) de vida.";
-        battleMessageHandler.addMessage(new BattleMessage(healMessage, BattleMessageType.HEAL_EFFECT, target));
+        battleMessageHandler.addMessage(new BattleMessage(healMessage, BattleMessageType.HEAL_EFFECT, target, new PlayerView(player)));
 
         return true;
     }
@@ -85,7 +88,7 @@ public class EffectHandler {
         int drawnCards = player.getCardManager().drawCards(numCards);
 
         String redrawMessage = numDiscardedCards + " carta(s) foram descartadas e " + drawnCards + " carta(s) foram compradas.";
-        battleMessageHandler.addMessage(new BattleMessage(redrawMessage, BattleMessageType.REDRAW_EFFECT, target));
+        battleMessageHandler.addMessage(new BattleMessage(redrawMessage, BattleMessageType.REDRAW_EFFECT, target, new PlayerView(player)));
 
         return true;
     }
@@ -95,7 +98,7 @@ public class EffectHandler {
         int drawnCards = player.getCardManager().drawCards(numCards);
 
         String drawMessage = player.getName() + " comprou " + drawnCards + " carta(s).";
-        battleMessageHandler.addMessage(new BattleMessage(drawMessage, BattleMessageType.DRAW_EFFECT, target));
+        battleMessageHandler.addMessage(new BattleMessage(drawMessage, BattleMessageType.DRAW_EFFECT, target, new PlayerView(player)));
 
         return true;
     }

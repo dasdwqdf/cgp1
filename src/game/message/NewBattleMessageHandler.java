@@ -34,9 +34,6 @@ public class NewBattleMessageHandler {
         }
 
         // Removemos o primeiro elemento da lista
-        BattleMessage battleMessage = battleMessageList.remove(0);
-
-        // Retornamos o tipo de mensagem de batalha que foi consumida
-        return battleMessage;
+        return battleMessageList.remove(0);
     }
 }

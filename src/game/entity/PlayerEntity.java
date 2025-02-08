@@ -1,7 +1,7 @@
 package game.entity;
 
-import game.cards.Card;
-import game.cards.CardManager;
+import game.card.Card;
+import game.card.CardManager;
 
 import java.awt.image.BufferedImage;
 

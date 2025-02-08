@@ -1,4 +1,4 @@
-package game.cards;
+package game.card;
 
 public enum CardEffect {
     REDRAW, DRAW, BUFF, HEAL, MANA;

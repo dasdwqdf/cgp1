@@ -1,4 +1,4 @@
-package game.cards;
+package game.card;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

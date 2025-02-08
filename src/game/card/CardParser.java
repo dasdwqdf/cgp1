@@ -1,4 +1,4 @@
-package game.cards;
+package game.card;
 
 import java.io.BufferedReader;
 import java.io.IOException;

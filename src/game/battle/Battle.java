@@ -1,20 +1,18 @@
 package game.battle;
 
-import game.cards.*;
+import game.card.*;
 import game.entity.AiEntity;
 import game.entity.ControllableEntity;
 import game.entity.PlayerEntity;
 import game.message.BattleMessage;
 import game.message.BattleMessageType;
 import game.message.NewBattleMessageHandler;
-import ui.controllers.BattleMenuController;
+import game.view.PlayerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Battle {
-
-    BattleMenuController battleMenuController;
 
     BattleState battleState;
     List<PlayerEntity> players;
@@ -22,11 +20,27 @@ public class Battle {
     int currentTurn;
     int currentPlayerIndex;
 
-    BattleMessageHandler battleMessageHandler;
     NewBattleMessageHandler newBattleMessageHandler;
     CombatPhaseHandler combatPhaseHandler;
     EffectHandler effectHandler;
 
+    // Batalha entre IAs
+    public Battle(boolean vsAI) {
+        // Batalha muda para estado em progresso
+        battleState = BattleState.IN_PROGRESS;
+
+        // Inicialização das IAs
+        initAis();
+
+        // Inicialização de alguns parâmetros
+        this.currentTurn = 0;
+        this.currentPlayerIndex = 0;
+        this.newBattleMessageHandler = new NewBattleMessageHandler();
+        this.effectHandler = new EffectHandler(newBattleMessageHandler);
+        this.combatPhaseHandler = new CombatPhaseHandler(newBattleMessageHandler, effectHandler);
+    }
+
+    // Batalha Comum entre jogador x IA
     public Battle() {
         // Batalha muda para estado em progresso
         battleState = BattleState.IN_PROGRESS;
@@ -48,6 +62,62 @@ public class Battle {
         players.add(new AiEntity("BOT", 6, 0,"deck01.txt"));
     }
 
+    public void initAis() {
+        players = new ArrayList<>();
+        players.add(new AiEntity("IA Focada na Maximização de Poder", 6, 0, "deck01.txt", AiEntity.AiEntityType.AI_TYPE_1));
+        players.add(new AiEntity("IA Focada na Conservação de Mana", 6, 0,"deck01.txt", AiEntity.AiEntityType.AI_TYPE_2));
+    }
+    
+    public BattleStatistics startAiBattle() {
+        // AIs
+        AiEntity firstAi = (AiEntity) players.get(0);
+        AiEntity secondAi = (AiEntity) players.get(1);
+
+        // Medidas
+        int firstAiTotalPower = 0;
+        int secondAiTotalPower = 0;
+        int firstAiUnusedMana = 0;
+        int secondAiUnusedMana = 0;
+        int firstAiNuMovements = 0;
+        int secondAiNuMovements = 0;
+        int nuTurns = 0;
+
+        // Embaralhamos o baralho de ambos os jogadores e compramos 5 cartas
+        for (PlayerEntity player : players) {
+            player.getCardManager().shuffleDeck();
+            player.getCardManager().drawCards(5);
+        }
+        
+        while (BattleState.IN_PROGRESS == battleState) {
+            // Turno da primeira AI
+            handleTurnStart(firstAi);
+            firstAiNuMovements += handleAiTurn(firstAi);
+            firstAiUnusedMana += firstAi.getMana(); // Mana restante após o turno
+            firstAiTotalPower += firstAi.getFieldCard() != null ? firstAi.getFieldCard().getTotalPower() : 0; // Função para calcular o dano causado
+            updateCurrentPlayerIndex();
+
+            // Turno da segunda AI
+            handleTurnStart(secondAi);
+            secondAiNuMovements += handleAiTurn(secondAi);
+            secondAiUnusedMana += secondAi.getMana(); // Mana restante após o turno
+            secondAiTotalPower += secondAi.getFieldCard() != null ? secondAi.getFieldCard().getTotalPower() : 0;
+            updateCurrentPlayerIndex();
+
+            // Fase de combate
+            handleBattlePhase();
+
+            nuTurns++;
+
+            // Atualizamos o estado da batalha
+            updateBattleState();
+        }
+
+        String winner = firstAi.getHp() > 0 ? firstAi.getName() : secondAi.getName();
+
+        return new BattleStatistics(nuTurns, firstAiTotalPower, secondAiTotalPower,
+                firstAiNuMovements, secondAiNuMovements, firstAiUnusedMana, secondAiUnusedMana, winner);
+    }
+
     public void startBattle() {
         // Entidades
         PlayerEntity firstPlayer = players.get(0);
@@ -61,8 +131,7 @@ public class Battle {
 
         // Mensagem de Início de Batalha
         String message = "Batalha iniciada entre " + firstPlayer.getName() + " e " + secondPlayer.getName() + ".";
-        newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.DRAW_CARD));
-//        battleMessageHandler.sendMessage(message);
+        newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.DRAW_CARD, 1, new PlayerView(firstPlayer)));
 
         // Inicia o Turno do Jogador
         startPlayerTurn();
@@ -70,13 +139,13 @@ public class Battle {
 
     public void handleTurnStart(PlayerEntity currentPlayer) {
         CardManager cardManager = currentPlayer.getCardManager();
+        int target = players.indexOf(currentPlayer) == 0 ? 1 : 2;
 
         // Jogador recupera mana
         if (currentPlayer.getMana() < PlayerEntity.maxMana) {
             currentPlayer.regenMana(1);
-            int target = !(currentPlayer instanceof AiEntity) ? 1 : 2;
             String message = currentPlayer.getName() + " recuperou 1 de mana.";
-            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.REGEN_MANA, target));
+            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.REGEN_MANA, target, new PlayerView(currentPlayer)));
         }
 
         // Tentamos comprar uma carta
@@ -85,7 +154,7 @@ public class Battle {
         if (drawnCards > 0) {
             // Mensagem de compra de cartas
             String message = currentPlayer.getName() + " comprou " + drawnCards + " cartas(s) do baralho.";
-            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.DRAW_CARD));
+            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.DRAW_CARD, target, new PlayerView(currentPlayer)));
         }
 
         // Lidamos com o descarte de cartas extras
@@ -109,7 +178,7 @@ public class Battle {
                 }
 
             } else {
-                newBattleMessageHandler.addMessage(new BattleMessage("Sua mão está cheia, selecione uma carta para descartar.", BattleMessageType.DISCARD_CARD));
+                newBattleMessageHandler.addMessage(new BattleMessage("Sua mão está cheia, selecione uma carta para descartar.", BattleMessageType.DISCARD_CARD, 1, new PlayerView(currentPlayer)));
             }
         }
 
@@ -125,24 +194,28 @@ public class Battle {
 
     private void startAiTurn() {
         // Resgatamos a entidade da AI
-        PlayerEntity aiEntity = players.get(currentPlayerIndex);
+        AiEntity aiEntity = (AiEntity) players.get(currentPlayerIndex);
 
         // Processamento genérico de turno de um PlayerEntity
         handleTurnStart(aiEntity);
+        handleAiTurn(aiEntity);
+        endAiTurn();
+    }
 
-        // AI seleciona o melhor movimento
-        Card card = aiEntity.selectBestCard();
-        boolean isCardPlayable = true;
+    private int handleAiTurn(AiEntity aiEntity) {
+        List<Card> aiMovements = aiEntity.selectMovementsAi();
+        int nuMovements = 0;
 
-        // Enquanto a AI tiver opções viáveis de acordo com o algoritmo,
-        // ela utiliza as cartas selecionadas
-        while(card != null && isCardPlayable) {
-            isCardPlayable = playCard(card);
-            card = aiEntity.selectBestCard();
+        while ((aiMovements != null) && (!aiMovements.isEmpty())) {
+            nuMovements += aiMovements.size();
+            for (Card movement : aiMovements) {
+                playCard(movement);
+            }
+
+            aiMovements = aiEntity.selectMovementsAi();
         }
 
-        // Finalizamos o turno da AI
-        endAiTurn();
+        return nuMovements;
     }
 
     public void endPlayerTurn() {
@@ -184,7 +257,7 @@ public class Battle {
             // Mensagem caso o jogador atual seja uma entidade controlável
             if (currentPlayer instanceof ControllableEntity) {
                 String message = "Mana insuficiente para utilizar " + card.getName() + ".";
-                newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE));
+                newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE , 1, new PlayerView(currentPlayer)));
             }
 
             return false;
@@ -199,7 +272,7 @@ public class Battle {
                 if (currentPlayerFieldCard != null) {
                     if (currentPlayer instanceof ControllableEntity) {
                         String message = "Não foi possível colocar " + card.getName() + ", pois " + currentPlayerFieldCard.getName() + " já está em campo.";
-                        newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE));
+                        newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.SIMPLE, 1, new PlayerView(currentPlayer)));
                     }
                     return false;
                 }
@@ -214,19 +287,14 @@ public class Battle {
                 // Mensagem de carta em campo
                 String message = currentPlayer.getName() + " colocou " + card.getName() + " em campo.";
                 int target = !(currentPlayer instanceof AiEntity) ? 1 : 2;
-                newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.FIELD_CARD, target));
+                newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.FIELD_CARD, target, new PlayerView(currentPlayer)));
 
                 return true;
 
             case EFFECT:
                 // Aplicamos o efeito utilizando o handler de efeitos
                 boolean used = effectHandler.handleEffect(currentPlayer, card);
-
-                if (used) {
-                    // Retiramos a carta da mão do jogador e consumimos a mana
-                    cardManager.useCard(card);
-                    currentPlayer.consumeMana(card.getManaCost());
-                }
+                if (used) cardManager.useCard(card);
 
                 return true;
 
@@ -261,7 +329,7 @@ public class Battle {
         PlayerEntity winner = null;
 
         for (PlayerEntity player : players) {
-            if (player.getHp() < 1) {
+            if (player.getHp() < 1 || player.getCardManager().getDeck().isEmpty()) {
                 battleState = BattleState.FINISHED;
 
                 // Determina que o adversário é o vencedor
@@ -274,7 +342,7 @@ public class Battle {
             // Mensagem de fim de partida
             String message = winner.getName() + " venceu a batalha.";
             int target = players.indexOf(winner) + 1;
-            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.GAME_FINISHED, target));
+            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.GAME_FINISHED, target, new PlayerView(winner)));
         }
     }
 
@@ -291,6 +359,8 @@ public class Battle {
 
         // Fase de combate para determinar o vencedor da rodada
         combatPhaseHandler.handleCombatPhase(firstPlayer, secondPlayer);
+        firstPlayer.clearFieldCard();
+        secondPlayer.clearFieldCard();
     }
 
     private List<PlayerEntity> getPlayerEntities() {
@@ -299,10 +369,6 @@ public class Battle {
 
     public List<PlayerEntity> getPlayers() {
         return players;
-    }
-
-    public BattleMessageHandler getBattleMessageHandler() {
-        return battleMessageHandler;
     }
 
     public NewBattleMessageHandler getNewBattleMessageHandler() {

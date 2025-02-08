@@ -1,4 +1,4 @@
-package game.cards;
+package game.card;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +65,6 @@ public class CardManager {
         }
         return drawnCards;
     }
-
 
     public int discardCards(int numCards) {
         int numDiscardedCards = 0;

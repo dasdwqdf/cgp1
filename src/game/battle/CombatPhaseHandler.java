@@ -1,12 +1,13 @@
 package game.battle;
 
-import game.cards.Card;
-import game.cards.CardElement;
-import game.cards.ElementalAdvantage;
+import game.card.Card;
+import game.card.CardElement;
+import game.card.ElementalAdvantage;
 import game.entity.PlayerEntity;
 import game.message.BattleMessage;
 import game.message.BattleMessageType;
 import game.message.NewBattleMessageHandler;
+import game.view.PlayerView;
 
 public class CombatPhaseHandler {
 
@@ -36,11 +37,11 @@ public class CombatPhaseHandler {
             // Mensagens para caso seja aplicado alguma vantagem/desvantagem
             if (elementalAdvantage > 0) {
                 String elementalMessage = elemento1.name() + " é efetivo contra " + elemento2.name() + ", +2 de poder para " + firstPlayerCard.getName() + ".";
-                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_UP));
+                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_UP, 1, new PlayerView(firstPlayer)));
 
             } else if (elementalAdvantage < 0) {
                 String elementalMessage = elemento1.name() + " é fraco contra " + elemento2.name() + ", -2 de poder para " + firstPlayerCard.getName() + ".";
-                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_DOWN));
+                newBattleMessageHandler.addMessage(new BattleMessage(elementalMessage, BattleMessageType.ELEMENTAL_POWER_DOWN, 1, new PlayerView(firstPlayer)));
             }
 
             // Aplicamos os aprimoramentos das cartas em campo
@@ -49,25 +50,25 @@ public class CombatPhaseHandler {
 
             if (firstPlayerTotalPower == secondPlayerTotalPower) { // EMPATE
                 String message = "Empate!";
-                newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.BATTLE_DRAW));
+                newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.BATTLE_DRAW, 1, new PlayerView(firstPlayer)));
 
             } else if (firstPlayerTotalPower > secondPlayerTotalPower) {
                 secondPlayer.receiveDamage(firstPlayerCard.getDirectDamage());
 
                 String winMessage = firstPlayer.getName() + " atacou com " + firstPlayerCard.getName() + " e venceu a rodada!";
-                newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN));
+                newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN, 1, new PlayerView(firstPlayer)));
 
                 String damageMessage = secondPlayer.getName() + " recebeu "+ firstPlayerCard.getDirectDamage() + " de dano.";
-                newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE, 2));
+                newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE, 2, new PlayerView(secondPlayer)));
 
             } else {
                 firstPlayer.receiveDamage(secondPlayerCard.getDirectDamage());
 
                 String winMessage = secondPlayer.getName() + " atacou com " + secondPlayerCard.getName() + " e venceu a rodada!";
-                newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN, 2));
+                newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN));
 
                 String damageMessage = firstPlayer.getName() + " recebeu " + secondPlayerCard.getDirectDamage() +" de dano.";
-                newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE));
+                newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE, 1, new PlayerView(firstPlayer)));
             }
 
             newBattleMessageHandler.addMessage(combatPhaseEndMessage);
@@ -76,7 +77,7 @@ public class CombatPhaseHandler {
 
         if (bothPlayersDidntPlaceAnyCards(firstPlayerCard, secondPlayerCard)) {
             String message = "Nenhuma Carta foi colocada em campo. Nada acontece.";
-            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.BATTLE_PHASE_END));
+            newBattleMessageHandler.addMessage(new BattleMessage(message, BattleMessageType.BATTLE_PHASE_END, 1, new PlayerView(firstPlayer)));
             return;
         }
 
@@ -88,8 +89,8 @@ public class CombatPhaseHandler {
             String damageMessage = firstPlayer.getName() + " recebeu "+ secondPlayerCard.getDirectDamage() +" de dano.";
 
             newBattleMessageHandler.addMessage(new BattleMessage(noFieldCardMessage, BattleMessageType.SIMPLE));
-            newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN,2));
-            newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE));
+            newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN,2, new PlayerView(secondPlayer)));
+            newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE, 1, new PlayerView(firstPlayer)));
         }
 
         if (secondPlayerCard == null) {
@@ -100,8 +101,8 @@ public class CombatPhaseHandler {
             String damageMessage = secondPlayer.getName() + " recebeu "+ firstPlayerCard.getDirectDamage() + " de dano.";
 
             newBattleMessageHandler.addMessage(new BattleMessage(noFieldCardMessage, BattleMessageType.SIMPLE));
-            newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN));
-            newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE,2));
+            newBattleMessageHandler.addMessage(new BattleMessage(winMessage, BattleMessageType.BATTLE_WIN, 1, new PlayerView(firstPlayer)));
+            newBattleMessageHandler.addMessage(new BattleMessage(damageMessage, BattleMessageType.DAMAGE,2, new PlayerView(secondPlayer)));
         }
 
         newBattleMessageHandler.addMessage(combatPhaseEndMessage);

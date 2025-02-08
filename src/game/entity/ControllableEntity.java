@@ -1,6 +1,6 @@
 package game.entity;
 
-import game.cards.Card;
+import game.card.Card;
 
 public class ControllableEntity extends PlayerEntity {
     public ControllableEntity(String name, int hp, int mana, String deckName) {

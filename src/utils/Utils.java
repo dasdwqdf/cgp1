@@ -1,6 +1,6 @@
 package utils;
 
-import game.cards.CardElement;
+import game.card.CardElement;
 
 import java.awt.*;
 import java.util.ArrayList;

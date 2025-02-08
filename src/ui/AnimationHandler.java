@@ -110,7 +110,7 @@ public class AnimationHandler {
         elementalPowerUpOrDownAnimation++;
 
         // Calcula as coordenadas
-        int x = playerMenuX + 4 * gamePanel.tileSize - 8;
+        int x = playerMenuX + 4 * gamePanel.tileSize - 8 + 3*margin;
         int y = playerMenuY + 2 * gamePanel.tileSize - 10;
 
         // Recupera o sprite do power-up

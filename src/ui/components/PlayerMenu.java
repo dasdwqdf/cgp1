@@ -1,6 +1,6 @@
 package ui.components;
 
-import game.cards.Card;
+import game.card.Card;
 import game.controller.GamePanel;
 import game.entity.PlayerEntity;
 import game.view.PlayerView;

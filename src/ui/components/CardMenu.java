@@ -1,7 +1,7 @@
 package ui.components;
 
-import game.cards.Card;
-import game.cards.CardType;
+import game.card.Card;
+import game.card.CardType;
 import game.controller.GamePanel;
 import ui.controllers.BattleMenuController;
 import utils.SpritesHandler;

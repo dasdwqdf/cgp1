@@ -1,6 +1,6 @@
 package game.view;
 
-import game.cards.Card;
+import game.card.Card;
 import game.entity.PlayerEntity;
 
 public class PlayerView {
@@ -22,6 +22,17 @@ public class PlayerView {
         this.mana = playerReference.getMana();
         this.nuCardsDeck = playerReference.getCardManager().getDeck().size();
         this.fieldCard = playerReference.getFieldCard() != null ? playerReference.getFieldCard().duplicate() : null;
+    }
+
+    public void updatePlayer(PlayerView playerView) {
+        if (playerView == null) {
+            return;
+        }
+
+        this.hp = playerView.getHp();
+        this.mana = playerView.getMana();
+        this.nuCardsDeck = playerView.getNuCardsDeck();
+        this.fieldCard = playerView.getFieldCard();
     }
 
     public void updateHp() {
