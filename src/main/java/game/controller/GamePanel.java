@@ -29,7 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Audio
     public Sound sound = new Sound();
-    public float musicVolume = -30.0f;
+    public float musicVolume = -20.0f;
     public float soundVolume = -30.0f;
 
     // KeyHandler
