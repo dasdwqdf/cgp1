@@ -8,7 +8,7 @@ O jogo oferece um sistema de batalha onde os jogadores se enfrentam utilizando c
 disponíveis em seus baralhos, com diferentes poderes e habilidades, onde o objetivo é
 zerar a vida do oponente.
 
-O objetivo do **TCC** foi desenvolver o **jogo de cartas por turno** e implementar
+O objetivo do **TCC** foi desenvolver um **jogo de cartas por turno** e implementar
 duas **Inteligências Artificias simples**, com diferentes abordagens, e avaliar o desempenho
 delas. A implementação das IAs permite ao jogador enfrentar o computador, e as duas abordagens são comparadas 
 em termos de desempenho e eficácia no jogo.
@@ -59,4 +59,4 @@ Se você tiver dúvidas sobre o projeto ou precisar de mais informações,
 fique a vontade para entrar em contato.
 
 - **E-mail**: contato.victorhugonascimento@gmail.com
-- **Github**: [https://github.com/dasdwqdf/cgp1](https://github.com/dasdwqdf/cgp1)
+- **Github**: [https://github.com/dasdwqdf](https://github.com/dasdwqdf)
